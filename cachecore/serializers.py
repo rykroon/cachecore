@@ -26,17 +26,6 @@ class PassthroughSerializer(BaseSerializer):
         return value
 
 
-class StringSerializer(BaseSerializer):
-
-    def dumps(self, value):
-        if isinstance(value, bytes):
-            return value.decode()
-        return str(value)
-
-    def loads(self, value):
-        return value
-
-
 class JsonSerializer(BaseSerializer):
 
     def __init__(self, encoder=None, decoder=None):
