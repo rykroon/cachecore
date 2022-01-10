@@ -1,6 +1,6 @@
-from cache.backends.base import BaseBackend
-from cache.constants import MissingKey
-from cache.serializers import RedisSerializer
+from cachecore.backends.base import BaseBackend
+from cachecore.singletons import MissingKey
+from cachecore.serializers import RedisSerializer
 
 
 class RedisBackend(BaseBackend):

@@ -1,5 +1,5 @@
 from typing import Any, Optional, Union
-from cache.constants import MissingKeyType
+from cachecore.singletons import MissingKeyType
 
 
 class BaseBackend:

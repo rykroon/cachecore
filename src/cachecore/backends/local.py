@@ -1,8 +1,9 @@
 from math import ceil
 import time
-from cache.backends.base import BaseBackend
-from cache.constants import MissingKey
-from cache.serializers import PassthroughSerializer
+
+from cachecore.backends.base import BaseBackend
+from cachecore.singletons import MissingKey
+from cachecore.serializers import PassthroughSerializer
 
 
 class LocalValue:
