@@ -2,69 +2,69 @@ import json
 import pickle
 import unittest
 
-from cachecore.serializers import PassthroughSerializer, StringSerializer, JsonSerializer, PickleSerializer
+from cachecore.serializers import PassthroughSerializer, RedisSerializer, JsonSerializer, PickleSerializer
 
 
-class TestPassthroughSerializer(unittest.TestCase):
+class AbstractSerializerTest(unittest.TestCase):
 
-    def test_dumps(self):
+    def setUp(self):
+        self.values = [
+            None, 
+            'foo', 
+            123, 
+            1.23, 
+            True,
+            [None, 'foo', 123, 1.23, True],
+            {
+                'foo': 123,
+                'bar': 1.23,
+                'baz': False,
+            }
+        ]
+
+
+class TestPassthroughSerializer(AbstractSerializerTest):
+
+    def test_dumps_loads(self):
         serializer = PassthroughSerializer()
-        values = [None, 'foo', 1, 1.23, True, [], {}, object()]
-        for value in values:
-            assert serializer.dumps(value) == value
 
-    def test_loads(self):
-        serializer = PassthroughSerializer()
-        values = [None, 'foo', 1, 1.23, True, [], {}, object()]
-        for value in values:
-            assert serializer.loads(value) == value
+        for value in self.values:
+            svalue = serializer.dumps(value)
+            assert type(svalue) == type(value)
+            assert serializer.loads(svalue) == value
 
 
-class TestStringSerializer(unittest.TestCase):
-
-    def test_dumps(self):
-        serializer = StringSerializer()
-        values = [None, 'foo', 1, 1.23, True, [], {}, object()]
-        for value in values:
-            assert serializer.dumps(value) == str(value)
-
-    def test_loads(self):
-        serializer = StringSerializer()
-        values = ['None', 'foo', '1', '1.23', 'True', '[]', '{}']
-        for value in values:
-            assert serializer.loads(value) == value
-
-
-class TestJsonSerializer(unittest.TestCase):
-    def test_dumps(self):
+class TestJsonSerializer(AbstractSerializerTest):
+    def test_dumps_loads(self):
         serializer = JsonSerializer()
-        values = [None, 'foo', 1, 1.23, True, [], {}]
-        for value in values:
-            assert serializer.dumps(value) == json.dumps(value)
 
-    def test_loads(self):
-        serializer = JsonSerializer()
-        values = [None, 'foo', 1, 1.23, True, [], {}]
-        values = [json.dumps(v) for v in values]
-
-        for value in values:
-            assert serializer.loads(value) == json.loads(value)
+        for value in self.values:
+            svalue = serializer.dumps(value)
+            assert type(svalue) == str
+            assert serializer.loads(svalue) == value
 
 
-class TestPickleSerializer(unittest.TestCase):
-    def test_dumps(self):
+class TestPickleSerializer(AbstractSerializerTest):
+    def test_dumps_loads(self):
         serializer = PickleSerializer()
-        values = [None, 'foo', 1, 1.23, True, [], {}, object()]
-        for value in values:
-            assert serializer.dumps(value) == pickle.dumps(value)
 
-    def test_loads(self):
-        serializer = PickleSerializer()
-        values = [None, 'foo', 1, 1.23, True, [], {}]
-        values = [pickle.dumps(v) for v in values]
+        for value in self.values:
+            svalue = serializer.dumps(value)
+            assert type(svalue) == bytes
+            assert serializer.loads(svalue) == value
 
-        for value in values:
-            assert serializer.loads(value) == pickle.loads(value)
+
+class TestRedisSerializer(AbstractSerializerTest):
+    def test_dumps_loads(self):
+        serializer = RedisSerializer()
+
+        for value in self.values:
+            svalue = serializer.dumps(value)
+            assert type(svalue) in [bytes, int]
+            assert serializer.loads(svalue) == value
+
+        assert serializer.dumps(20) == 20
+        assert serializer.loads(20) == 20
 
 
 if __name__ == '__main__':
