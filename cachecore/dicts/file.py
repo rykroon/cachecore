@@ -1,4 +1,5 @@
 import os
+from hashlib import md5
 
 
 _default = object()
@@ -30,6 +31,16 @@ class FileDict(dict):
             os.makedirs(self._dir, 0o700, exist_ok=True)
         finally:
             os.umask(old_umask)
+
+    def _key_to_file(self, key):
+        """
+        Convert a key into a cache file path. Basically this is the
+        root cache path joined with the md5sum of the key and a suffix.
+        """
+        return os.path.join(self._dir, ''.join([
+            md5(key.encode(), usedforsecurity=False).hexdigest(),
+            self.cache_suffix,
+        ]))
 
     def clear(self):
         ...
