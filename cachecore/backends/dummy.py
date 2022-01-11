@@ -1,5 +1,5 @@
 from cachecore.backends.base import BaseBackend
-from cachecore.singletons import MissingKey
+from cachecore.utils import MissingKey
 
 
 class DummyBackend(BaseBackend):

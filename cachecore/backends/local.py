@@ -1,41 +1,20 @@
-from math import ceil
-import time
-
 from cachecore.backends.base import BaseBackend
-from cachecore.singletons import MissingKey
-from cachecore.serializers import PassthroughSerializer
-
-
-class LocalValue:
-    def __init__(self, value, ttl):
-        self.value = value
-        self.set_ttl(ttl)
-
-    def get_ttl(self):
-        if self.expires_at is None:
-            return None
-
-        return max(0, ceil(self.expires_at - time.time()))
-
-    def set_ttl(self, ttl):
-        self.expires_at = None if ttl is None else time.time() + ttl
-
-    def is_expired(self):
-        if self.expires_at is None:
-            return False
-        return time.time() > self.expires_at
+from cachecore.serializers import PickleSerializer
+from cachecore.utils import MissingKey, Value
 
 
 class LocalBackend(BaseBackend):
 
-    def __init__(self, serializer=None):
-        self.serializer = serializer if serializer is not None else PassthroughSerializer()
+    def __init__(self):
+        self.serializer = PickleSerializer()
         self.data = {}
 
     def _get_value(self, key):
         value = self.data.get(key)
         if value is None:
             return MissingKey
+
+        value = self.serializer.loads(value)
         
         if value.is_expired():
             del self.data[key]
@@ -50,8 +29,7 @@ class LocalBackend(BaseBackend):
         return self.serializer.loads(value.value)
 
     def set(self, key, value, ttl):
-        value = self.serializer.dumps(value)
-        self.data[key] = LocalValue(value, ttl)
+        self.data[key] = self.serializer.dumps(Value(value, ttl))
 
     def add(self, key, value, ttl):
         if self.has_key(key):

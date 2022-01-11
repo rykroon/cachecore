@@ -7,7 +7,7 @@ from cachecore.backends import BaseBackend
 from cachecore.backends import DummyBackend
 from cachecore.backends import LocalBackend
 from cachecore.backends import RedisBackend
-from cachecore.singletons import MissingKey
+from cachecore.utils import MissingKey
 
 
 class TestBackend(unittest.TestCase):
