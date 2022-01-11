@@ -1,8 +1,6 @@
-import json
-import pickle
 import unittest
 
-from cachecore.serializers import PassthroughSerializer, RedisSerializer, JsonSerializer, PickleSerializer
+from cachecore.serializers import RedisSerializer, PickleSerializer
 
 
 class AbstractSerializerTest(unittest.TestCase):
@@ -21,27 +19,6 @@ class AbstractSerializerTest(unittest.TestCase):
                 'baz': False,
             }
         ]
-
-
-class TestPassthroughSerializer(AbstractSerializerTest):
-
-    def test_dumps_loads(self):
-        serializer = PassthroughSerializer()
-
-        for value in self.values:
-            svalue = serializer.dumps(value)
-            assert type(svalue) == type(value)
-            assert serializer.loads(svalue) == value
-
-
-class TestJsonSerializer(AbstractSerializerTest):
-    def test_dumps_loads(self):
-        serializer = JsonSerializer()
-
-        for value in self.values:
-            svalue = serializer.dumps(value)
-            assert type(svalue) == str
-            assert serializer.loads(svalue) == value
 
 
 class TestPickleSerializer(AbstractSerializerTest):

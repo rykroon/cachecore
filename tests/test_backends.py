@@ -134,16 +134,16 @@ class AbstractBackendTest:
         assert self.backend.get_many('a', 'b', 'c') == [MissingKey] * 3
 
 
+class TestLocalBackend(unittest.TestCase, AbstractBackendTest):
+    def setUp(self):
+        self.backend = LocalBackend()
+
+
 class TestRedisBackend(unittest.TestCase, AbstractBackendTest):
     def setUp(self):
         client = redis.Redis()
         client.flushdb()
         self.backend = RedisBackend(client=client)
-
-
-class TestLocalBackend(unittest.TestCase, AbstractBackendTest):
-    def setUp(self):
-        self.backend = LocalBackend()
 
 
 if __name__ == '__main__':
