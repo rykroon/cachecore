@@ -1,4 +1,3 @@
-import json
 import pickle
 
 
@@ -15,34 +14,6 @@ class BaseSerializer:
 
     def loads(self, value):
         raise NotImplementedError
-
-
-class PassthroughSerializer(BaseSerializer):
-
-    def dumps(self, value):
-        return value
-
-    def loads(self, value):
-        return value
-
-
-class JsonSerializer(BaseSerializer):
-
-    def __init__(self, encoder=None, decoder=None):
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def dump(self, value, file):
-        return json.dump(value, file, cls=self.encoder)
-
-    def load(self, file):
-        return json.load(file, cls=self.decoder)
-
-    def dumps(self, value):
-        return json.dumps(value, cls=self.encoder)
-
-    def loads(self, value):
-        return json.loads(value, cls=self.decoder)
 
 
 class PickleSerializer(BaseSerializer):
