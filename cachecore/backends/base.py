@@ -39,14 +39,18 @@ class BaseBackend:
         raise NotImplementedError
 
     def delete_many(self, keys: list[str]) -> list[bool]:
-        # Return the number of deleted keys
+        """
+            Deletes all of the keys in the list.
+            Returns a list of boolean values indicating 
+                if the key was deleted.
+        """
         raise NotImplementedError
 
     def get_ttl(self, key: str) -> Optional[int]:
         """
             Returns the TTL of the key.
             Return None if key does not have a ttl
-            Returns MissingKey if the key does not exist.
+            Returns 0 if the key does not exist.
         """
         raise NotImplementedError
 
