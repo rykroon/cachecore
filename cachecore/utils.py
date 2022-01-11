@@ -49,5 +49,5 @@ class MissingKeyType:
         return 'MissingKey'
 
 
-MissingKey = MissingKeyType
+MissingKey = MissingKeyType()
 
