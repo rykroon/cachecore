@@ -11,38 +11,38 @@ class RedisBackend(BaseBackend):
             raise ValueError("Cannot pass a client and client kwargs.")
 
         if client:
-            self.client = client
+            self._client = client
             return
 
         import redis
-        self.client = redis.Redis(**client_kwargs)
+        self._client = redis.Redis(**client_kwargs)
 
     def get(self, key):
-        value = self.client.get(key)
+        value = self._client.get(key)
         if value is None:
             return MissingKey
         return self.serializer.loads(value)
 
     def set(self, key, value, ttl):
         value = self.serializer.dumps(value)
-        self.client.set(key, value, ex=ttl)
+        self._client.set(key, value, ex=ttl)
 
     def add(self, key, value, ttl):
         value = self.serializer.dumps(value)
-        return self.client.set(key, value, ex=ttl, nx=True) is not None
+        return self._client.set(key, value, ex=ttl, nx=True) is not None
 
     def delete(self, key):
-        return self.client.delete(key) != 0
+        return self._client.delete(key) != 0
 
     def has_key(self, key):
-        return self.client.exists(key) == 1
+        return self._client.exists(key) == 1
 
     def get_many(self, *keys):
-        values = self.client.mget(*keys)
+        values = self._client.mget(*keys)
         return [MissingKey if v is None else self.serializer.loads(v) for v in values]
 
     def set_many(self, mapping, ttl):
-        pipeline = self.client.pipeline()
+        pipeline = self._client.pipeline()
         for k, v in mapping.items():
             value = self.serializer.dumps(v)
             pipeline.set(k, value, ex=ttl)
@@ -50,13 +50,13 @@ class RedisBackend(BaseBackend):
         pipeline.execute()
 
     def delete_many(self, *keys):
-        pipeline = self.client.pipeline()
+        pipeline = self._client.pipeline()
         for k in keys:
             pipeline.delete(k)
         return [result == 1 for result in pipeline.execute()]
 
     def get_ttl(self, key):
-        result = self.client.ttl(key)
+        result = self._client.ttl(key)
         if result == -2:
             return 0
 
@@ -67,9 +67,9 @@ class RedisBackend(BaseBackend):
 
     def set_ttl(self, key, ttl):
         if ttl is None:
-            self.client.persist(key)
+            self._client.persist(key)
         else:
-            self.client.expire(key, ttl)
+            self._client.expire(key, ttl)
 
     def clear(self):
-        self.client.flushdb()
+        self._client.flushdb()
