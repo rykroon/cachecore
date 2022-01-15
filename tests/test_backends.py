@@ -1,3 +1,4 @@
+import os
 import unittest
 import time
 
@@ -7,6 +8,7 @@ from cachecore.backends import BaseBackend
 from cachecore.backends import DummyBackend
 from cachecore.backends import LocalBackend
 from cachecore.backends import RedisBackend
+from cachecore.backends import FileBackend
 from cachecore.utils import MissingKey
 
 
@@ -137,6 +139,16 @@ class AbstractBackendTest:
 class TestLocalBackend(unittest.TestCase, AbstractBackendTest):
     def setUp(self):
         self.backend = LocalBackend()
+
+
+class TestFileBackend(unittest.TestCase, AbstractBackendTest):
+    def setUp(self):
+        self.backend = FileBackend(dir='foobar')
+
+        # this a temporary hack.
+        self.backend.delete('a')
+        self.backend.delete('b')
+        self.backend.delete('c')
 
 
 class TestRedisBackend(unittest.TestCase, AbstractBackendTest):
