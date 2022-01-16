@@ -3,7 +3,7 @@ from hashlib import md5
 
 from cachecore.backends.base import BaseBackend
 from cachecore.serializers import PickleSerializer
-from cachecore.utils import MissingKey, Value
+from cachecore.utils import MISSING_KEY, Value
 
 
 class FileBackend(BaseBackend):
@@ -26,11 +26,11 @@ class FileBackend(BaseBackend):
                 value = self.serializer.load(f)
                 if value.is_expired():
                     # delete file
-                    return MissingKey
+                    return MISSING_KEY
                 return value
 
         except FileNotFoundError:
-            return MissingKey
+            return MISSING_KEY
 
     def _write_value(self, key, value):
         fname = self._key_to_file(key)
@@ -39,8 +39,8 @@ class FileBackend(BaseBackend):
 
     def get(self, key):
         value = self._read_value(key)
-        if value is MissingKey:
-            return MissingKey
+        if value is MISSING_KEY:
+            return MISSING_KEY
         return value.value
 
     def set(self, key, value, ttl):
@@ -79,12 +79,12 @@ class FileBackend(BaseBackend):
 
     def get_ttl(self, key):
         value = self._read_value(key)
-        if value is MissingKey:
+        if value is MISSING_KEY:
             return 0
         return value.get_ttl()
 
     def set_ttl(self, key, ttl):
         value = self._read_value(key)
-        if value is not MissingKey:
+        if value is not MISSING_KEY:
             value.set_ttl(ttl)
             self._write_value(key, value)

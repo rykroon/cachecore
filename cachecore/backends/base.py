@@ -1,10 +1,10 @@
 from typing import Any, Optional, Union
-from cachecore.utils import MissingKeyType
+from cachecore.utils import MissingKey
 
 
 class BaseBackend:
 
-    def get(self, key: str) -> Union[Any, MissingKeyType]:
+    def get(self, key: str) -> Union[Any, MissingKey]:
         """
             Returns the value associated with the key.
             Returns MissingKey if key is not found.

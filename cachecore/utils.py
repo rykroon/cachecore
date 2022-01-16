@@ -40,7 +40,7 @@ def singleton(class_):
 
 
 @singleton
-class MissingKeyType:
+class MissingKey:
 
     def __bool__(self):
         return False
@@ -49,5 +49,5 @@ class MissingKeyType:
         return 'MissingKey'
 
 
-MissingKey = MissingKeyType()
+MISSING_KEY = MissingKey()
 

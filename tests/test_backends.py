@@ -9,7 +9,7 @@ from cachecore.backends import DummyBackend
 from cachecore.backends import LocalBackend
 from cachecore.backends import RedisBackend
 from cachecore.backends import FileBackend
-from cachecore.utils import MissingKey
+from cachecore.utils import MISSING_KEY
 
 
 class TestBackend(unittest.TestCase):
@@ -41,11 +41,11 @@ class TestDummyBackend(unittest.TestCase):
         self.backend = DummyBackend()
 
     def test_get(self):
-        assert self.backend.get('a') is MissingKey
+        assert self.backend.get('a') is MISSING_KEY
     
     def test_set(self):
         assert self.backend.set('a', 1, None) is None
-        assert self.backend.get('a') is MissingKey
+        assert self.backend.get('a') is MISSING_KEY
 
     def test_delete(self):
         assert self.backend.delete('a') == False
@@ -58,11 +58,11 @@ class TestDummyBackend(unittest.TestCase):
         assert self.backend.has_key('a') == False
 
     def test_get_many(self):
-        assert self.backend.get_many('a', 'b', 'c') == [MissingKey] * 3
+        assert self.backend.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
     def test_set_many(self):
         assert self.backend.set_many({'a': 1, 'b': 2, 'c': 3}, None) is None
-        assert self.backend.get_many('a', 'b', 'c') == [MissingKey] * 3
+        assert self.backend.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
     def test_delete_many(self):
         assert self.backend.delete_many('a', 'b', 'c') == [False, False, False]
@@ -78,7 +78,7 @@ class TestDummyBackend(unittest.TestCase):
 class AbstractBackendTest:
 
     def test_get_set(self):
-        assert self.backend.get('a') is MissingKey
+        assert self.backend.get('a') is MISSING_KEY
 
         self.backend.set('a', 1, None)
         assert self.backend.get('a') == 1
@@ -100,7 +100,7 @@ class AbstractBackendTest:
 
         self.backend.set('a', 1, None)
         assert self.backend.delete('a') == True
-        assert self.backend.get('a') is MissingKey
+        assert self.backend.get('a') is MISSING_KEY
         
     def test_has_key(self):
         assert self.backend.has_key('a') == False
@@ -118,7 +118,7 @@ class AbstractBackendTest:
         assert self.backend.get_ttl('a') == 299
 
     def test_get_set_many(self):
-        assert self.backend.get_many('a', 'b', 'c') == [MissingKey] * 3
+        assert self.backend.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
         self.backend.set_many({'a': 1, 'b': 2, 'c': 3}, None)
         assert self.backend.get_many('a', 'b', 'c') == [1, 2, 3]
@@ -133,7 +133,7 @@ class AbstractBackendTest:
     def test_delete_many(self):
         self.backend.set_many({'a': 1, 'b': 2, 'c': 3}, None)
         assert self.backend.delete_many('a', 'b', 'c') == [True] * 3
-        assert self.backend.get_many('a', 'b', 'c') == [MissingKey] * 3
+        assert self.backend.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
 
 class TestLocalBackend(unittest.TestCase, AbstractBackendTest):

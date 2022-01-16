@@ -1,11 +1,11 @@
 from cachecore.backends.base import BaseBackend
-from cachecore.utils import MissingKey
+from cachecore.utils import MISSING_KEY
 
 
 class DummyBackend(BaseBackend):
 
     def get(self, key):
-        return MissingKey
+        return MISSING_KEY
 
     def set(self, key, value, ttl):
         pass
@@ -20,7 +20,7 @@ class DummyBackend(BaseBackend):
         return False
 
     def get_many(self, *keys):
-        return [MissingKey] * len(keys)
+        return [MISSING_KEY] * len(keys)
 
     def set_many(self, mapping, ttl):
         pass

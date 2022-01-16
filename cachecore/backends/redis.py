@@ -1,6 +1,6 @@
 from cachecore.backends.base import BaseBackend
 from cachecore.serializers import RedisSerializer
-from cachecore.utils import MissingKey
+from cachecore.utils import MISSING_KEY
 
 
 class RedisBackend(BaseBackend):
@@ -20,7 +20,7 @@ class RedisBackend(BaseBackend):
     def get(self, key):
         value = self._client.get(key)
         if value is None:
-            return MissingKey
+            return MISSING_KEY
         return self.serializer.loads(value)
 
     def set(self, key, value, ttl):
@@ -39,7 +39,7 @@ class RedisBackend(BaseBackend):
 
     def get_many(self, *keys):
         values = self._client.mget(*keys)
-        return [MissingKey if v is None else self.serializer.loads(v) for v in values]
+        return [MISSING_KEY if v is None else self.serializer.loads(v) for v in values]
 
     def set_many(self, mapping, ttl):
         pipeline = self._client.pipeline()

@@ -1,25 +1,36 @@
 from typing import Union
 from cachecore.backends.base import BaseBackend
 from cachecore.serializers import PickleSerializer
-from cachecore.utils import MissingKey, MissingKeyType, Value
+from cachecore.utils import MissingKey, MISSING_KEY, Value
 
 
 class LocalBackend(BaseBackend):
+
+    """
+        IDEA! Define a lower lower level API with the following methods:
+            - _read
+            - _write
+            - _delete
+        All other methods can be accomplished using these methods.
+        In scenarios where relying on the default logic isn't best, 
+            just override the method.
+    """
+
 
     def __init__(self):
         self.serializer = PickleSerializer()
         self._data = {}
 
-    def _read_value(self, key: str) -> Union[Value, MissingKeyType]:
+    def _read_value(self, key: str) -> Union[Value, MissingKey]:
         value = self._data.get(key)
         if value is None:
-            return MissingKey
+            return MISSING_KEY
 
         value = self.serializer.loads(value)
         
         if value.is_expired():
             self._del(key)
-            return MissingKey
+            return MISSING_KEY
 
         return value
 
@@ -28,8 +39,8 @@ class LocalBackend(BaseBackend):
 
     def get(self, key):
         value = self._read_value(key)
-        if value is MissingKey:
-            return MissingKey
+        if value is MISSING_KEY:
+            return MISSING_KEY
         return value.value
 
     def set(self, key, value, ttl):
@@ -42,11 +53,11 @@ class LocalBackend(BaseBackend):
         return True
 
     def delete(self, key):
-        return self._data.pop(key, MissingKey) is not MissingKey
+        return self._data.pop(key, MISSING_KEY) is not MISSING_KEY
 
     def has_key(self, key):
         value = self._read_value(key)
-        return value is not MissingKey
+        return value is not MISSING_KEY
 
     def get_many(self, *keys):
         return [self.get(k) for k in keys]
@@ -60,13 +71,13 @@ class LocalBackend(BaseBackend):
 
     def get_ttl(self, key):
         value = self._read_value(key)
-        if value is MissingKey:
+        if value is MISSING_KEY:
             return 0
         return value.get_ttl()
 
     def set_ttl(self, key, ttl):
         value = self._read_value(key)
-        if value is not MissingKey:
+        if value is not MISSING_KEY:
             value.set_ttl(ttl)
             self._write_value(key, value)
 

@@ -1,4 +1,4 @@
 from cachecore.backends import *
-from cachecore.utils import MissingKey
+from cachecore.utils import MISSING_KEY
 
 __version__ = "0.1.0"
