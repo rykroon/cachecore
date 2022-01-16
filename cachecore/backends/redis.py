@@ -1,9 +1,8 @@
-from cachecore.backends.base import BaseBackend
 from cachecore.serializers import RedisSerializer
 from cachecore.utils import MISSING_KEY
 
 
-class RedisBackend(BaseBackend):
+class RedisBackend:
 
     def __init__(self, serializer=None, client=None, **client_kwargs):
         self.serializer = serializer if serializer is not None else RedisSerializer()
@@ -70,6 +69,12 @@ class RedisBackend(BaseBackend):
             self._client.persist(key)
         else:
             self._client.expire(key, ttl)
+
+    def incrby(self, key, delta):
+        ...
+
+    def decrby(self, key, delta):
+        ...
 
     def clear(self):
         self._client.flushdb()

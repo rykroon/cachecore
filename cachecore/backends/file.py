@@ -1,12 +1,11 @@
 import os
 from hashlib import md5
 
-from cachecore.backends.base import BaseBackend
 from cachecore.serializers import PickleSerializer
 from cachecore.utils import MISSING_KEY, Value
 
 
-class FileBackend(BaseBackend):
+class FileBackend:
     
     def __init__(self, dir, ext='.cachecore'):
         self.serializer = PickleSerializer()
@@ -88,3 +87,12 @@ class FileBackend(BaseBackend):
         if value is not MISSING_KEY:
             value.set_ttl(ttl)
             self._write_value(key, value)
+
+    def incrby(self, key, delta):
+        ...
+
+    def decrby(self, key, delta):
+        ...
+
+    def clear(self):
+        ...

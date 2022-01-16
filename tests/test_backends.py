@@ -4,35 +4,19 @@ import time
 
 import redis
 
-from cachecore.backends import BaseBackend
+from cachecore.backends import BackendProtocol
 from cachecore.backends import DummyBackend
 from cachecore.backends import LocalBackend
 from cachecore.backends import RedisBackend
 from cachecore.backends import FileBackend
 from cachecore.utils import MISSING_KEY
 
-
-class TestBackend(unittest.TestCase):
-
-    def test_all(self):
-        backend = BaseBackend()
-        with self.assertRaises(NotImplementedError):
-            backend.get('a')
-
-        with self.assertRaises(NotImplementedError):
-            backend.set('a', b'1', None)
-
-        with self.assertRaises(NotImplementedError):
-            backend.delete('a')
-
-        with self.assertRaises(NotImplementedError):
-            backend.has_key('a')
-
-        with self.assertRaises(NotImplementedError):
-            backend.get_ttl('a')
-
-        with self.assertRaises(NotImplementedError):
-            backend.set_ttl('a', None)
+class TestProtocol(unittest.TestCase):
+    def test_protocol(self):
+        assert issubclass(DummyBackend, BackendProtocol)
+        assert issubclass(LocalBackend, BackendProtocol)
+        assert issubclass(RedisBackend, BackendProtocol)
+        assert issubclass(FileBackend, BackendProtocol)
 
 
 class TestDummyBackend(unittest.TestCase):

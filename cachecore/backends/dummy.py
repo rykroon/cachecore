@@ -1,8 +1,7 @@
-from cachecore.backends.base import BaseBackend
 from cachecore.utils import MISSING_KEY
 
 
-class DummyBackend(BaseBackend):
+class DummyBackend:
 
     def get(self, key):
         return MISSING_KEY
@@ -33,6 +32,12 @@ class DummyBackend(BaseBackend):
 
     def set_ttl(self, key, ttl):
         pass
+
+    def incrby(self, key, delta):
+        ...
+
+    def decrby(self, key, delta):
+        ...
 
     def clear(self):
         pass

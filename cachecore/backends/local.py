@@ -1,10 +1,9 @@
 from typing import Union
-from cachecore.backends.base import BaseBackend
 from cachecore.serializers import PickleSerializer
 from cachecore.utils import MissingKey, MISSING_KEY, Value
 
 
-class LocalBackend(BaseBackend):
+class LocalBackend:
 
     """
         IDEA! Define a lower lower level API with the following methods:
@@ -80,6 +79,12 @@ class LocalBackend(BaseBackend):
         if value is not MISSING_KEY:
             value.set_ttl(ttl)
             self._write_value(key, value)
+
+    def incrby(self, key, delta):
+        ...
+
+    def decrby(self, key, delta):
+        ...
 
     def clear(self):
         self._data.clear()

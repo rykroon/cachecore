@@ -1,8 +1,9 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional, Union, Protocol, runtime_checkable
 from cachecore.utils import MissingKey
 
 
-class BaseBackend:
+@runtime_checkable
+class BackendProtocol(Protocol):
 
     def get(self, key: str) -> Union[Any, MissingKey]:
         """
@@ -61,10 +62,10 @@ class BaseBackend:
         raise NotImplementedError
 
     def incrby(self, key, delta):
-        ...
+        raise NotImplementedError
 
     def decrby(self, key, delta):
-        ...
+        raise NotImplementedError
 
     def clear(self):
         raise NotImplementedError
