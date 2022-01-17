@@ -63,7 +63,7 @@ class LocalBackend:
         return [self.get(k) for k in keys]
 
     def set_many(self, mapping, ttl):
-        for k, v in mapping.items():
+        for k, v in mapping:
             self.set(k, v, ttl)
 
     def delete_many(self, *keys):

@@ -42,7 +42,7 @@ class RedisBackend:
 
     def set_many(self, mapping, ttl):
         pipeline = self._client.pipeline()
-        for k, v in mapping.items():
+        for k, v in mapping:
             value = self.serializer.dumps(v)
             pipeline.set(k, value, ex=ttl)
         

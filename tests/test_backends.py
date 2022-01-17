@@ -45,7 +45,7 @@ class TestDummyBackend(unittest.TestCase):
         assert self.backend.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
     def test_set_many(self):
-        assert self.backend.set_many({'a': 1, 'b': 2, 'c': 3}, None) is None
+        assert self.backend.set_many({'a': 1, 'b': 2, 'c': 3}.items(), None) is None
         assert self.backend.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
     def test_delete_many(self):
@@ -104,18 +104,18 @@ class AbstractBackendTest:
     def test_get_set_many(self):
         assert self.backend.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
-        self.backend.set_many({'a': 1, 'b': 2, 'c': 3}, None)
+        self.backend.set_many([('a', 1), ('b', 2), ('c', 3)], None)
         assert self.backend.get_many('a', 'b', 'c') == [1, 2, 3]
         for k in ['a', 'b', 'c']:
             assert self.backend.get_ttl(k) is None
 
-        self.backend.set_many({'a': 1, 'b': 2, 'c': 3}, 300)
+        self.backend.set_many({'a': 1, 'b': 2, 'c': 3}.items(), 300)
         assert self.backend.get_many('a', 'b', 'c') == [1, 2, 3]
         for k in ['a', 'b', 'c']:
             assert self.backend.get_ttl(k) == 300
 
     def test_delete_many(self):
-        self.backend.set_many({'a': 1, 'b': 2, 'c': 3}, None)
+        self.backend.set_many({'a': 1, 'b': 2, 'c': 3}.items(), None)
         assert self.backend.delete_many('a', 'b', 'c') == [True] * 3
         assert self.backend.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 

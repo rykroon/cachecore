@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Any, Optional, Union, Protocol, runtime_checkable
 from cachecore.utils import MissingKey
 
@@ -36,7 +37,7 @@ class BackendProtocol(Protocol):
     def get_many(self, keys: list[str]) -> list[Any]:
         raise NotImplementedError
 
-    def set_many(self, mapping: dict[str, Any], ttl: Optional[int]):
+    def set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int]):
         raise NotImplementedError
 
     def delete_many(self, keys: list[str]) -> list[bool]:
