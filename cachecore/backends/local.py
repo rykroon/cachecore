@@ -1,5 +1,6 @@
+import pickle
 from typing import Union
-from cachecore.serializers import PickleSerializer
+
 from cachecore.utils import MissingKey, MISSING_KEY, Value
 
 
@@ -17,7 +18,7 @@ class LocalBackend:
 
 
     def __init__(self):
-        self.serializer = PickleSerializer()
+        self.serializer = pickle
         self._data = {}
 
     def _read_value(self, key: str) -> Union[Value, MissingKey]:

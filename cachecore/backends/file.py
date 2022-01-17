@@ -1,14 +1,14 @@
-import os
 from hashlib import md5
+import os
+import pickle
 
-from cachecore.serializers import PickleSerializer
 from cachecore.utils import MISSING_KEY, Value
 
 
 class FileBackend:
     
     def __init__(self, dir, ext='.cachecore'):
-        self.serializer = PickleSerializer()
+        self.serializer = pickle
         self._dir = os.path.abspath(dir)
         self._ext = ext
         os.makedirs(self._dir, mode=0o700, exist_ok=True)

@@ -1,48 +1,41 @@
 import pickle
+from typing import Protocol, runtime_checkable
 
 
-class BaseSerializer:
+@runtime_checkable
+class StringSerializer(Protocol):
 
-    def dump(self, value, file):
-        raise NotImplementedError
+    def dumps(self, obj):
+        ...
 
-    def load(self, file):
-        raise NotImplementedError
-
-    def dumps(self, value):
-        raise NotImplementedError
-
-    def loads(self, value):
-        raise NotImplementedError
+    def loads(self, data):
+        ...
 
 
-class PickleSerializer(BaseSerializer):
+@runtime_checkable
+class FileSerializer(Protocol):
 
-    def __init__(self, protocol=pickle.DEFAULT_PROTOCOL):
-        self.protocol = protocol
-
-    def dump(self, value, file):
-        return pickle.dump(value, file, protocol=self.protocol)
+    def dump(self, obj, file):
+        ...
 
     def load(self, file):
-        return pickle.load(file)
-
-    def dumps(self, value):
-        return pickle.dumps(value, protocol=self.protocol)
-
-    def loads(self, value):
-        return pickle.loads(value)
+        ...
 
 
-class RedisSerializer(PickleSerializer):
+@runtime_checkable
+class Serializer(StringSerializer, FileSerializer, Protocol):
+    ...
+
+
+class RedisSerializer:
 
     def dumps(self, value):
         if type(value) == int:
             return value
-        return super().dumps(value)
+        return pickle.dumps(value)
 
     def loads(self, value):
         try:
             return int(value)
         except ValueError:
-            return super().loads(value)
+            return pickle.loads(value)

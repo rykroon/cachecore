@@ -1,6 +1,15 @@
+import pickle
 import unittest
 
-from cachecore.serializers import RedisSerializer, PickleSerializer
+from cachecore.serializers import RedisSerializer, Serializer, StringSerializer
+
+
+
+class TestSerializerInterface(unittest.TestCase):
+
+    def test_all(self):
+        assert isinstance(pickle, Serializer)
+        assert issubclass(RedisSerializer, StringSerializer)
 
 
 class AbstractSerializerTest(unittest.TestCase):
@@ -19,16 +28,6 @@ class AbstractSerializerTest(unittest.TestCase):
                 'baz': False,
             }
         ]
-
-
-class TestPickleSerializer(AbstractSerializerTest):
-    def test_dumps_loads(self):
-        serializer = PickleSerializer()
-
-        for value in self.values:
-            svalue = serializer.dumps(value)
-            assert type(svalue) == bytes
-            assert serializer.loads(svalue) == value
 
 
 class TestRedisSerializer(AbstractSerializerTest):
