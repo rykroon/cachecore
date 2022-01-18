@@ -11,6 +11,7 @@ from cachecore.backends import RedisBackend
 from cachecore.backends import FileBackend
 from cachecore.utils import MISSING_KEY
 
+
 class TestProtocol(unittest.TestCase):
     def test_protocol(self):
         assert issubclass(DummyBackend, BackendProtocol)
@@ -127,12 +128,14 @@ class TestLocalBackend(unittest.TestCase, AbstractBackendTest):
 
 class TestFileBackend(unittest.TestCase, AbstractBackendTest):
     def setUp(self):
-        self.backend = FileBackend(dir='foobar')
+        home_dir = os.environ['HOME']
+        dir = os.path.join(home_dir, 'cachecore-tests')
+        self.backend = FileBackend(dir=dir)
 
-        # this a temporary hack.
-        self.backend.delete('a')
-        self.backend.delete('b')
-        self.backend.delete('c')
+        for fname in os.listdir(dir):
+            if fname.endswith('.cachecore'):
+                fpath = os.path.join(dir, fname)
+                os.remove(fpath)
 
 
 class TestRedisBackend(unittest.TestCase, AbstractBackendTest):
