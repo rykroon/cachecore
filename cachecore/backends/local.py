@@ -29,7 +29,7 @@ class LocalBackend:
         value = self.serializer.loads(value)
         
         if value.is_expired():
-            self._del(key)
+            self.delete(key)
             return MISSING_KEY
 
         return value
