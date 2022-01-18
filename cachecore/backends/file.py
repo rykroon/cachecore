@@ -23,10 +23,11 @@ class FileBackend:
         try:
             with open(fname, 'rb') as f:
                 value = self.serializer.load(f)
-                if value.is_expired():
-                    # delete file
-                    return MISSING_KEY
-                return value
+
+            if value.is_expired():
+                self.delete(value)
+                return MISSING_KEY
+            return value
 
         except FileNotFoundError:
             return MISSING_KEY
