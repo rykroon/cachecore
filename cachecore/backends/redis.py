@@ -4,8 +4,8 @@ from cachecore.utils import MISSING_KEY
 
 class RedisBackend:
 
-    def __init__(self, serializer=None, client=None, **client_kwargs):
-        self.serializer = serializer if serializer is not None else RedisSerializer()
+    def __init__(self, client=None, **client_kwargs):
+        self.serializer = RedisSerializer()
         if client and client_kwargs:
             raise ValueError("Cannot pass a client and client kwargs.")
 
