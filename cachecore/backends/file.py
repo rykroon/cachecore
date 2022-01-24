@@ -96,4 +96,12 @@ class FileBackend:
         ...
 
     def clear(self):
-        ...
+        for fname in os.listdir(self._dir):
+            if not fname.endswith(self._ext):
+                continue
+
+            fpath = os.path.join(self._dir, fname)
+            try:
+                os.remove(fpath)
+            except FileNotFoundError:
+                pass
