@@ -22,11 +22,11 @@ class RedisBackend:
             return MISSING_KEY
         return self.serializer.loads(value)
 
-    def set(self, key, value, ttl):
+    def set(self, key, value, ttl=None):
         value = self.serializer.dumps(value)
         self._client.set(key, value, ex=ttl)
 
-    def add(self, key, value, ttl):
+    def add(self, key, value, ttl=None):
         value = self.serializer.dumps(value)
         return self._client.set(key, value, ex=ttl, nx=True) is not None
 
@@ -40,7 +40,7 @@ class RedisBackend:
         values = self._client.mget(*keys)
         return [MISSING_KEY if v is None else self.serializer.loads(v) for v in values]
 
-    def set_many(self, mapping, ttl):
+    def set_many(self, mapping, ttl=None):
         pipeline = self._client.pipeline()
         for k, v in mapping:
             value = self.serializer.dumps(v)
@@ -57,14 +57,14 @@ class RedisBackend:
     def get_ttl(self, key):
         result = self._client.ttl(key)
         if result == -2:
-            return 0
+            return MISSING_KEY
 
         if result == -1:
             return None
 
         return result
 
-    def set_ttl(self, key, ttl):
+    def set_ttl(self, key, ttl=None):
         if ttl is None:
             self._client.persist(key)
         else:

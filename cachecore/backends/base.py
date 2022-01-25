@@ -13,7 +13,7 @@ class BackendProtocol(Protocol):
         """
         raise NotImplementedError
 
-    def set(self, key: str, value: Any, ttl: Optional[int]):
+    def set(self, key: str, value: Any, ttl: Optional[int]=None):
         """
             Set the value of `value` to key `key`.
             The key will expire after `ttl` seconds.
@@ -21,7 +21,7 @@ class BackendProtocol(Protocol):
         """
         raise NotImplementedError
 
-    def add(self, key: str, value: Any, ttl: Optional[int]) -> bool:
+    def add(self, key: str, value: Any, ttl: Optional[int]=None) -> bool:
         raise NotImplementedError
 
     def delete(self, key: str) -> bool:
@@ -37,7 +37,7 @@ class BackendProtocol(Protocol):
     def get_many(self, keys: list[str]) -> list[Any]:
         raise NotImplementedError
 
-    def set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int]):
+    def set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int]=None):
         raise NotImplementedError
 
     def delete_many(self, keys: list[str]) -> list[bool]:
@@ -48,15 +48,15 @@ class BackendProtocol(Protocol):
         """
         raise NotImplementedError
 
-    def get_ttl(self, key: str) -> Optional[int]:
+    def get_ttl(self, key: str) -> Union[int, None, MissingKey]:
         """
             Returns the TTL of the key.
             Return None if key does not have a ttl
-            Returns 0 if the key does not exist.
+            Returns MissingKey if the key does not exist.
         """
         raise NotImplementedError
 
-    def set_ttl(self, key: str, ttl: Optional[int]):
+    def set_ttl(self, key: str, ttl: Optional[int]=None):
         """
             Sets the TTL of the key.
         """

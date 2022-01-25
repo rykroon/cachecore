@@ -43,10 +43,10 @@ class FileBackend:
             return MISSING_KEY
         return value.value
 
-    def set(self, key, value, ttl):
+    def set(self, key, value, ttl=None):
         self._write_value(key, Value(value, ttl))
 
-    def add(self, key, value, ttl):
+    def add(self, key, value, ttl=None):
         if self.has_key(key):
             return False
         self.set(key, value, ttl)
@@ -70,7 +70,7 @@ class FileBackend:
     def get_many(self, *keys):
         return [self.get(k) for k in keys]
 
-    def set_many(self, mapping, ttl):
+    def set_many(self, mapping, ttl=None):
         for k, v in mapping:
             self.set(k, v, ttl)
 
@@ -80,10 +80,10 @@ class FileBackend:
     def get_ttl(self, key):
         value = self._read_value(key)
         if value is MISSING_KEY:
-            return 0
+            return MISSING_KEY
         return value.get_ttl()
 
-    def set_ttl(self, key, ttl):
+    def set_ttl(self, key, ttl=None):
         value = self._read_value(key)
         if value is not MISSING_KEY:
             value.set_ttl(ttl)
