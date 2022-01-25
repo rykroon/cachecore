@@ -91,6 +91,9 @@ class AbstractBackendTest:
         assert self.backend.has_key('a') == False
         self.backend.set('a', 1)
         assert self.backend.has_key('a') == True
+        self.backend.set('a', 1, 1)
+        time.sleep(1)
+        assert self.backend.has_key('a') == False
 
     def test_get_set_ttl(self):
         assert self.backend.get_ttl('a') is MISSING_KEY

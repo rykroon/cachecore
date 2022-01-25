@@ -25,7 +25,7 @@ class FileBackend:
                 value = self.serializer.load(f)
 
             if value.is_expired():
-                self.delete(value)
+                self.delete(key)
                 return MISSING_KEY
             return value
 
@@ -64,8 +64,8 @@ class FileBackend:
         return True
 
     def has_key(self, key):
-        fname = self._key_to_file(key)
-        return os.path.isfile(fname)
+        value = self._read_value(key)
+        return value is not MISSING_KEY
 
     def get_many(self, *keys):
         return [self.get(k) for k in keys]
