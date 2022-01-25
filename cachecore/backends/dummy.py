@@ -33,11 +33,11 @@ class DummyBackend:
     def set_ttl(self, key, ttl=None):
         pass
 
-    def incrby(self, key, delta):
-        ...
+    def incr(self, key, delta=1):
+        return delta
 
-    def decrby(self, key, delta):
-        ...
+    def decr(self, key, delta=1):
+        return -delta
 
     def clear(self):
         pass

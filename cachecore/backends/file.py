@@ -2,7 +2,7 @@ from hashlib import md5
 import os
 import pickle
 
-from cachecore.utils import MISSING_KEY, Value
+from cachecore.utils import MISSING_KEY, MissingKey, Value
 
 
 class FileBackend:
@@ -89,11 +89,17 @@ class FileBackend:
             value.set_ttl(ttl)
             self._write_value(key, value)
 
-    def incrby(self, key, delta):
-        ...
+    def incr(self, key, delta=1):
+        value = self._read_value(key)
+        if value is MISSING_KEY:
+            value = Value(0, None)
 
-    def decrby(self, key, delta):
-        ...
+        value.value += delta
+        self._write_value(key, value)
+        return value.value
+
+    def decr(self, key, delta=1):
+        return self.incr(key, -delta)
 
     def clear(self):
         for fname in os.listdir(self._dir):

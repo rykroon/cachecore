@@ -62,10 +62,10 @@ class BackendProtocol(Protocol):
         """
         raise NotImplementedError
 
-    def incrby(self, key, delta):
+    def incr(self, key, delta=1) -> int:
         raise NotImplementedError
 
-    def decrby(self, key, delta):
+    def decr(self, key, delta=1) -> int:
         raise NotImplementedError
 
     def clear(self):

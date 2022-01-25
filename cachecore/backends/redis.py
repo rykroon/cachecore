@@ -70,11 +70,11 @@ class RedisBackend:
         else:
             self._client.expire(key, ttl)
 
-    def incrby(self, key, delta):
-        ...
+    def incr(self, key, delta=1):
+        return self._client.incr(key, delta)
 
-    def decrby(self, key, delta):
-        ...
+    def decr(self, key, delta=1):
+        return self._client.decr(key, delta)
 
     def clear(self):
         self._client.flushdb()

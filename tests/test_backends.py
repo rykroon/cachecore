@@ -120,6 +120,13 @@ class AbstractBackendTest:
         assert self.backend.delete_many('a', 'b', 'c') == [True] * 3
         assert self.backend.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
+    def test_incr_decr(self):
+        assert self.backend.incr('a') == 1
+        assert self.backend.incr('b', 20) == 20
+
+        assert self.backend.decr('a') == 0
+        assert self.backend.decr('b', 5) == 15
+
 
 class TestLocalBackend(unittest.TestCase, AbstractBackendTest):
     def setUp(self):
