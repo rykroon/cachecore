@@ -21,7 +21,7 @@ class LocalBackend:
         self.serializer = pickle
         self._data = {}
 
-    def _read_value(self, key: str) -> Union[Value, MissingKey]:
+    def _get_value(self, key: str) -> Union[Value, MissingKey]:
         value = self._data.get(key)
         if value is None:
             return MISSING_KEY
@@ -34,17 +34,17 @@ class LocalBackend:
 
         return value
 
-    def _write_value(self, key: str, value: Value):
+    def _set_value(self, key: str, value: Value):
         self._data[key] = self.serializer.dumps(value)        
 
     def get(self, key):
-        value = self._read_value(key)
+        value = self._get_value(key)
         if value is MISSING_KEY:
             return MISSING_KEY
         return value.value
 
     def set(self, key, value, ttl=None):
-        self._write_value(key, Value(value, ttl))
+        self._set_value(key, Value(value, ttl))
 
     def add(self, key, value, ttl=None):
         if self.has_key(key):
@@ -56,7 +56,7 @@ class LocalBackend:
         return self._data.pop(key, MISSING_KEY) is not MISSING_KEY
 
     def has_key(self, key):
-        value = self._read_value(key)
+        value = self._get_value(key)
         return value is not MISSING_KEY
 
     def get_many(self, *keys):
@@ -70,24 +70,24 @@ class LocalBackend:
         return [self.delete(k) for k in keys]
 
     def get_ttl(self, key):
-        value = self._read_value(key)
+        value = self._get_value(key)
         if value is MISSING_KEY:
             return MISSING_KEY
         return value.get_ttl()
 
     def set_ttl(self, key, ttl=None):
-        value = self._read_value(key)
+        value = self._get_value(key)
         if value is not MISSING_KEY:
             value.set_ttl(ttl)
-            self._write_value(key, value)
+            self._set_value(key, value)
 
     def incr(self, key, delta=1):
-        value = self._read_value(key)
+        value = self._get_value(key)
         if value is MISSING_KEY:
             value = Value(0, None)
 
         value.value += delta
-        self._write_value(key, value)
+        self._set_value(key, value)
         return value.value
 
     def decr(self, key, delta=1):
