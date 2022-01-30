@@ -1,50 +1,48 @@
 from hashlib import md5
-import os
 import pickle
 
-from cachecore.utils import MISSING_KEY, MissingKey, Value
+from cachecore.utils import MISSING_KEY, Value, Directory
 
 
 class FileBackend:
     
     def __init__(self, dir, ext='.cachecore'):
         self.serializer = pickle
-        self._dir = os.path.abspath(dir)
+        self._dir = Directory(dir)
         self._ext = ext
-        os.makedirs(self._dir, mode=0o700, exist_ok=True)
 
     def _key_to_file(self, key):
         fname = md5(key.encode(), usedforsecurity=False).hexdigest()
         fname += self._ext
-        return os.path.join(self._dir, fname)
+        return fname
 
-    def _read_value(self, key):
+    def _get_value(self, key):
         fname = self._key_to_file(key)
         try:
-            with open(fname, 'rb') as f:
-                value = self.serializer.load(f)
-
-            if value.is_expired():
-                self.delete(key)
-                return MISSING_KEY
-            return value
-
-        except FileNotFoundError:
+            value = self._dir[fname]
+        except KeyError:
+            return MISSING_KEY
+        
+        value = self.serializer.loads(value)
+        if value.is_expired():
+            del self._dir[fname]
             return MISSING_KEY
 
-    def _write_value(self, key, value):
+        return value
+
+    def _set_value(self, key, value):
         fname = self._key_to_file(key)
-        with open(fname, 'wb') as f:
-            self.serializer.dump(value, f)
+        self._dir[fname] = self.serializer.dumps(value)
 
     def get(self, key):
-        value = self._read_value(key)
+        value = self._get_value(key)
         if value is MISSING_KEY:
             return MISSING_KEY
         return value.value
 
     def set(self, key, value, ttl=None):
-        self._write_value(key, Value(value, ttl))
+        value = Value(value, ttl)
+        self._set_value(key, value)
 
     def add(self, key, value, ttl=None):
         if self.has_key(key):
@@ -54,18 +52,15 @@ class FileBackend:
 
     def delete(self, key):
         fname = self._key_to_file(key)
-        if not os.path.exists(fname):
-            return False
-        
         try:
-            os.remove(fname)
-        except FileNotFoundError:
+            del self._dir[fname]
+        except KeyError:
             return False
+
         return True
 
     def has_key(self, key):
-        value = self._read_value(key)
-        return value is not MISSING_KEY
+        return self.get(key) is not MISSING_KEY
 
     def get_many(self, *keys):
         return [self.get(k) for k in keys]
@@ -78,36 +73,35 @@ class FileBackend:
         return [self.delete(k) for k in keys]
 
     def get_ttl(self, key):
-        value = self._read_value(key)
+        value = self._get_value(key)
         if value is MISSING_KEY:
             return MISSING_KEY
         return value.get_ttl()
 
     def set_ttl(self, key, ttl=None):
-        value = self._read_value(key)
+        value = self._get_value(key)
         if value is not MISSING_KEY:
             value.set_ttl(ttl)
-            self._write_value(key, value)
+            self._set_value(key, value)
 
     def incr(self, key, delta=1):
-        value = self._read_value(key)
+        value = self._get_value(key)
         if value is MISSING_KEY:
             value = Value(0, None)
 
         value.value += delta
-        self._write_value(key, value)
+        self._set_value(key, value)
         return value.value
 
     def decr(self, key, delta=1):
         return self.incr(key, -delta)
 
     def clear(self):
-        for fname in os.listdir(self._dir):
-            if not fname.endswith(self._ext):
+        for path in self._dir:
+            if not path.is_file():
+                continue
+                
+            if not path.name.endswith(self._ext):
                 continue
 
-            fpath = os.path.join(self._dir, fname)
-            try:
-                os.remove(fpath)
-            except FileNotFoundError:
-                pass
+            path.unlink(missing_ok=True)
