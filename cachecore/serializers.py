@@ -3,28 +3,13 @@ from typing import Protocol, runtime_checkable
 
 
 @runtime_checkable
-class StringSerializer(Protocol):
+class Serializer(Protocol):
 
     def dumps(self, obj):
         ...
 
     def loads(self, data):
         ...
-
-
-@runtime_checkable
-class FileSerializer(Protocol):
-
-    def dump(self, obj, file):
-        ...
-
-    def load(self, file):
-        ...
-
-
-@runtime_checkable
-class Serializer(StringSerializer, FileSerializer, Protocol):
-    ...
 
 
 class RedisSerializer:
