@@ -1,5 +1,6 @@
 from functools import cache
 from math import ceil
+from pathlib import Path
 import time
 
 
@@ -32,6 +33,45 @@ class Value:
 
     def is_expired(self):
         return self.get_ttl() == 0
+
+
+class Directory:
+
+    def __init__(self, dir):
+        self.path = Path(dir)
+        if not self.path.is_absolute():
+            self.path = self.path.absolute()
+
+        if self.path.exists() and not self.path.is_dir():
+            raise Exception
+
+        if not self.path.exists():
+            self.path.mkdir()
+
+    def __getitem__(self, key):
+        f = self.path / key
+        try:
+            return f.read_bytes()
+        except FileNotFoundError:
+            raise KeyError(key)
+
+    def __setitem__(self, key, value):
+        f = self.path / key
+        f.write_bytes(value)
+
+    def __delitem__(self, key):
+        f = self.path / key
+        try:
+            f.unlink()
+        except FileNotFoundError:
+            raise KeyError(key)
+
+    def __contains__(self, key):
+        f = self.path / key
+        return f.exists()
+
+    def __iter__(self):
+        return self.path.iterdir()
 
 
 def singleton(class_):
