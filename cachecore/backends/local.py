@@ -6,17 +6,6 @@ from cachecore.utils import MissingKey, MISSING_KEY, Value
 
 class LocalBackend:
 
-    """
-        IDEA! Define a lower lower level API with the following methods:
-            - _read
-            - _write
-            - _delete
-        All other methods can be accomplished using these methods.
-        In scenarios where relying on the default logic isn't best, 
-            just override the method.
-    """
-
-
     def __init__(self):
         self.serializer = pickle
         self._data = {}
