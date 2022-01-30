@@ -1,13 +1,10 @@
 from collections.abc import Iterable
 from typing import Any, Optional, Union, Protocol, runtime_checkable
-from cachecore.serializers import Serializer
 from cachecore.utils import MissingKey
 
 
 @runtime_checkable
 class BackendProtocol(Protocol):
-
-    serializer: Serializer
 
     def get(self, key: str) -> Union[Any, MissingKey]:
         """
