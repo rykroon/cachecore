@@ -4,7 +4,7 @@ import time
 
 import redis
 
-from cachecore.backends import BackendProtocol
+from cachecore.backends import CacheInterface
 from cachecore.backends import DummyBackend
 from cachecore.backends import LocalBackend
 from cachecore.backends import RedisBackend
@@ -14,10 +14,10 @@ from cachecore.utils import MISSING_KEY
 
 class TestProtocol(unittest.TestCase):
     def test_protocol(self):
-        assert issubclass(DummyBackend, BackendProtocol)
-        assert issubclass(LocalBackend, BackendProtocol)
-        assert issubclass(RedisBackend, BackendProtocol)
-        assert issubclass(FileBackend, BackendProtocol)
+        assert issubclass(DummyBackend, CacheInterface)
+        assert issubclass(LocalBackend, CacheInterface)
+        assert issubclass(RedisBackend, CacheInterface)
+        assert issubclass(FileBackend, CacheInterface)
 
 
 class TestDummyBackend(unittest.TestCase):
