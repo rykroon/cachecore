@@ -1,7 +1,7 @@
 from cachecore.utils import MISSING_KEY
 
 
-class DummyBackend:
+class DummyCache:
 
     def get(self, key):
         return MISSING_KEY

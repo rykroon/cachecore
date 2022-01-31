@@ -2,7 +2,7 @@ from cachecore.serializers import RedisSerializer
 from cachecore.utils import MISSING_KEY
 
 
-class RedisBackend:
+class RedisCache:
 
     def __init__(self, client=None, **client_kwargs):
         self.serializer = RedisSerializer()

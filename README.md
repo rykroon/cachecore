@@ -1,5 +1,5 @@
 # cachecore
-A low-level caching library with multiple backends.
+A low-level caching library with multiple implementations.
 
 Can be used as a stand-alone cacheing library or can be used to create higher level caching libraries.
 
@@ -8,7 +8,7 @@ Get, set, delete, and check for the existence of a key using the following.
 
 ```
 >>> import cachecore
->>> cache = cachecore.LocalBackend()
+>>> cache = cachecore.LocalCache()
 >>> cache.set('a', 1)
 >>> cache.get('a')
 1
@@ -53,7 +53,7 @@ MissingKey
 ```
 
 
-## Cache Backends
+## Cache Implementations
 - Dummy
 - Local Memory
 - File System
