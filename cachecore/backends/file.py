@@ -60,7 +60,7 @@ class FileBackend:
         return True
 
     def has_key(self, key):
-        return self.get(key) is not MISSING_KEY
+        return self._get_value(key) is not MISSING_KEY
 
     def get_many(self, *keys):
         return [self.get(k) for k in keys]
