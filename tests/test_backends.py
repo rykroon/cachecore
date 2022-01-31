@@ -130,6 +130,12 @@ class AbstractBackendTest:
         assert self.backend.decr('a') == 0
         assert self.backend.decr('b', 5) == 15
 
+    def test_clear(self):
+        self.backend.set_many([('a', 1), ('b', 2), ('c', 3)])
+        self.backend.clear()
+        for k in ('a', 'b', 'c'):
+            assert self.backend.has_key(k) is False
+
 
 class TestLocalBackend(unittest.TestCase, AbstractBackendTest):
     def setUp(self):
