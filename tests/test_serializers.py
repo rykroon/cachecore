@@ -1,7 +1,7 @@
 import pickle
 import unittest
 
-from cachecore.serializers import RedisSerializer, Serializer
+from pycachecore.serializers import RedisSerializer, Serializer
 
 
 

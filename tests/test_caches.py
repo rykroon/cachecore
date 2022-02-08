@@ -4,12 +4,12 @@ import time
 
 import redis
 
-from cachecore.caches import CacheInterface
-from cachecore.caches import DummyCache
-from cachecore.caches import LocalCache
-from cachecore.caches import RedisCache
-from cachecore.caches import FileCache
-from cachecore.utils import MISSING_KEY
+from pycachecore.caches import CacheInterface
+from pycachecore.caches import DummyCache
+from pycachecore.caches import LocalCache
+from pycachecore.caches import RedisCache
+from pycachecore.caches import FileCache
+from pycachecore.utils import MISSING_KEY
 
 
 class TestProtocol(unittest.TestCase):

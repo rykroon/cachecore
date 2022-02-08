@@ -1,4 +1,4 @@
-from cachecore.utils import MISSING_KEY
+from pycachecore.utils import MISSING_KEY
 
 
 class DummyCache:

@@ -2,7 +2,7 @@ import os
 import unittest
 import time
 
-from cachecore.utils import Value, MISSING_KEY, MissingKey, Directory
+from pycachecore.utils import Value, MISSING_KEY, MissingKey, Directory
 
 
 class TestMissingKey(unittest.TestCase):

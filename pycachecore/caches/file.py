@@ -1,7 +1,7 @@
 from hashlib import md5
 import pickle
 
-from cachecore.utils import MISSING_KEY, Value, Directory
+from pycachecore.utils import MISSING_KEY, Value, Directory
 
 
 class FileCache:
