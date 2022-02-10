@@ -1,5 +1,5 @@
-from pycachecore.serializers import RedisSerializer
-from pycachecore.utils import MISSING_KEY
+from cachecore.serializers import RedisSerializer
+from cachecore.utils import MISSING_KEY
 
 
 class RedisCache:

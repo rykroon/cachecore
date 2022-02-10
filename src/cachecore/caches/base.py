@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from typing import Any, Optional, Union, Protocol, runtime_checkable
-from pycachecore.utils import MissingKey
+from cachecore.utils import MissingKey
 
 
 @runtime_checkable

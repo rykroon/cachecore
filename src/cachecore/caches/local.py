@@ -1,7 +1,7 @@
 import pickle
 from typing import Union
 
-from pycachecore.utils import MissingKey, MISSING_KEY, Value
+from cachecore.utils import MissingKey, MISSING_KEY, Value
 
 
 class LocalCache:
