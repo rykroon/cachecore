@@ -24,7 +24,13 @@ class LocalCache:
         return value
 
     def _set_value(self, key: str, value: Value):
-        self._data[key] = self.serializer.dumps(value)        
+        self._data[key] = self.serializer.dumps(value)
+
+    def _prune(self):
+        for k, v in self._data.items():
+            value = self.serializer.loads(v)
+            if value.is_expired():
+                del self._data[k]
 
     def get(self, key):
         value = self._get_value(key)
