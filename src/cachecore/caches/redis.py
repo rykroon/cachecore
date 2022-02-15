@@ -31,10 +31,10 @@ class RedisCache:
         return self._client.set(key, value, ex=ttl, nx=True) is not None
 
     def delete(self, key):
-        return self._client.delete(key) != 0
+        return bool(self._client.delete(key))
 
     def has_key(self, key):
-        return self._client.exists(key) == 1
+        return bool(self._client.exists(key))
 
     def get_many(self, *keys):
         values = self._client.mget(*keys)
@@ -52,7 +52,7 @@ class RedisCache:
         pipeline = self._client.pipeline()
         for k in keys:
             pipeline.delete(k)
-        return [result == 1 for result in pipeline.execute()]
+        return [bool(result) for result in pipeline.execute()]
 
     def get_ttl(self, key):
         result = self._client.ttl(key)
