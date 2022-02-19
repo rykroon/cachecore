@@ -6,8 +6,9 @@ from cachecore.utils import MissingKey, MISSING_KEY, Value
 
 class LocalCache:
 
+    serializer = pickle
+
     def __init__(self):
-        self.serializer = pickle
         self._data = {}
 
     def _get_value(self, key: str) -> Union[Value, MissingKey]:

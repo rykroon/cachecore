@@ -5,9 +5,10 @@ from cachecore.utils import MISSING_KEY, Value, Directory
 
 
 class FileCache:
+
+    serializer = pickle
     
     def __init__(self, dir, ext='.cachecore'):
-        self.serializer = pickle
         self._dir = Directory(dir)
         self._ext = ext
 
