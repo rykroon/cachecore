@@ -26,7 +26,7 @@ class FileCache:
         
         value = self.serializer.loads(value)
         if value.is_expired():
-            del self._dir[fname]
+            self._del_value(key)
             return MISSING_KEY
 
         return value
@@ -34,6 +34,14 @@ class FileCache:
     def _set_value(self, key, value):
         fname = self._key_to_file(key)
         self._dir[fname] = self.serializer.dumps(value)
+
+    def _del_value(self, key):
+        fname = self._key_to_file(key)
+        try:
+            del self._dir[fname]
+        except KeyError:
+            return False
+        return True
 
     def get(self, key):
         value = self._get_value(key)
@@ -52,13 +60,9 @@ class FileCache:
         return True
 
     def delete(self, key):
-        fname = self._key_to_file(key)
-        try:
-            del self._dir[fname]
-        except KeyError:
+        if not self.has_key(key):
             return False
-
-        return True
+        return self._del_value(key)
 
     def has_key(self, key):
         return self._get_value(key) is not MISSING_KEY

@@ -19,13 +19,20 @@ class LocalCache:
         value = self.serializer.loads(value)
         
         if value.is_expired():
-            self.delete(key)
+            self._del_value(key)
             return MISSING_KEY
 
         return value
 
     def _set_value(self, key: str, value: Value):
         self._data[key] = self.serializer.dumps(value)
+
+    def _del_value(self, key):
+        try:
+            del self._data[key]
+        except KeyError:
+            return False
+        return True
 
     def _prune(self):
         for k, v in self._data.items():
@@ -49,7 +56,9 @@ class LocalCache:
         return True
 
     def delete(self, key):
-        return self._data.pop(key, MISSING_KEY) is not MISSING_KEY
+        if not self.has_key(key):
+            return False
+        return self._del_value(key)
 
     def has_key(self, key):
         value = self._get_value(key)
