@@ -27,7 +27,7 @@ class TestDummyCache(unittest.TestCase):
 
     def test_get(self):
         assert self.cache.get('a') is MISSING_KEY
-    
+
     def test_set(self):
         assert self.cache.set('a', 1, None) is None
         assert self.cache.get('a') is MISSING_KEY
@@ -86,6 +86,12 @@ class AbstractCacheTest:
         self.cache.set('a', 1)
         assert self.cache.delete('a') == True
         assert self.cache.get('a') is MISSING_KEY
+
+        # Check so that if a key expires then deleting
+        # should return False.
+        self.cache.set('a', 1, 1)
+        time.sleep(1)
+        assert self.cache.delete('a') == False
         
     def test_has_key(self):
         assert self.cache.has_key('a') == False
