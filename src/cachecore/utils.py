@@ -4,7 +4,7 @@ from pathlib import Path
 import time
 
 
-class Value:
+class Value(dict):
 
     """
         A helper class for storing values with a TTL.
@@ -14,6 +14,22 @@ class Value:
     def __init__(self, value, ttl):
         self.value = value
         self.set_ttl(ttl)
+
+    @property
+    def value(self):
+        return self['value']
+
+    @value.setter
+    def value(self, value):
+        self['value'] = value
+
+    @property
+    def expires_at(self):
+        return self['expires_at']
+
+    @expires_at.setter
+    def expires_at(self, value):
+        self['expires_at'] = value
 
     def __getstate__(self):
         return (self.value, self.expires_at)
