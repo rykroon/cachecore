@@ -1,26 +1,45 @@
 import pickle
-from typing import Protocol, runtime_checkable
+import json
+from typing import Any, Protocol, Union, runtime_checkable
 
 
 @runtime_checkable
 class Serializer(Protocol):
 
-    def dumps(self, obj):
+    def dumps(self, obj: Any) -> bytes:
         ...
 
-    def loads(self, data):
+    def loads(self, data: bytes) -> Any:
         ...
+
+
+class JSONSerializer:
+
+    def __init__(self, encoder=None, decoder=None):
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def dumps(self, obj: Any) -> bytes:
+        json_string = json.dumps(
+            obj, 
+            cls=self.encoder, 
+            separators=(',', ':')
+        )
+        return json_string.encode()
+
+    def loads(self, data: bytes) -> Any:
+        return json.loads(data, cls=self.decoder)
 
 
 class RedisSerializer:
 
-    def dumps(self, value):
-        if type(value) == int:
-            return value
-        return pickle.dumps(value)
+    def dumps(self, obj: Any) -> Union[bytes, int]:
+        if type(obj) == int:
+            return obj
+        return pickle.dumps(obj)
 
-    def loads(self, value):
+    def loads(self, data: Union[bytes, int]) -> Any:
         try:
-            return int(value)
+            return int(data)
         except ValueError:
-            return pickle.loads(value)
+            return pickle.loads(data)
