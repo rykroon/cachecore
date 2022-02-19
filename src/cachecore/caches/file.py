@@ -7,7 +7,7 @@ from cachecore.utils import MISSING_KEY, Value, Directory
 class FileCache:
 
     serializer = pickle
-    
+
     def __init__(self, dir, ext='.cachecore'):
         self._dir = Directory(dir)
         self._ext = ext
@@ -23,7 +23,7 @@ class FileCache:
             value = self._dir[fname]
         except KeyError:
             return MISSING_KEY
-        
+
         value = self.serializer.loads(value)
         if value.is_expired():
             self._del_value(key)
@@ -105,7 +105,7 @@ class FileCache:
         for path in self._dir:
             if not path.is_file():
                 continue
-                
+
             if not path.name.endswith(self._ext):
                 continue
 

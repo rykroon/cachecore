@@ -46,7 +46,7 @@ class RedisCache:
         for k, v in mapping:
             value = self.serializer.dumps(v)
             pipeline.set(k, value, ex=ttl)
-        
+
         pipeline.execute()
 
     def delete_many(self, *keys):

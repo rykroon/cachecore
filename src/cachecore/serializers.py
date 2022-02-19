@@ -21,8 +21,8 @@ class JSONSerializer:
 
     def dumps(self, obj: Any) -> bytes:
         json_string = json.dumps(
-            obj, 
-            cls=self.encoder, 
+            obj,
+            cls=self.encoder,
             separators=(',', ':')
         )
         return json_string.encode()

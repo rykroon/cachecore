@@ -17,7 +17,7 @@ class LocalCache:
             return MISSING_KEY
 
         value = self.serializer.loads(value)
-        
+
         if value.is_expired():
             self._del_value(key)
             return MISSING_KEY
