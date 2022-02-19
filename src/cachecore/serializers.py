@@ -1,6 +1,6 @@
 import pickle
 import json
-from typing import Any, Protocol, Union, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 
 @runtime_checkable
@@ -33,12 +33,12 @@ class JSONSerializer:
 
 class RedisSerializer:
 
-    def dumps(self, obj: Any) -> Union[bytes, int]:
+    def dumps(self, obj: Any) -> bytes:
         if type(obj) == int:
-            return obj
+            return str(obj).encode()
         return pickle.dumps(obj)
 
-    def loads(self, data: Union[bytes, int]) -> Any:
+    def loads(self, data: bytes) -> Any:
         try:
             return int(data)
         except ValueError:
