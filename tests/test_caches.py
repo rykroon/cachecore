@@ -33,20 +33,21 @@ class TestDummyCache(unittest.TestCase):
         assert self.cache.get('a') is MISSING_KEY
 
     def test_delete(self):
-        assert self.cache.delete('a') == False
+        assert self.cache.delete('a') is False
         self.cache.set('a', 1, None)
-        assert self.cache.delete('a') == False
+        assert self.cache.delete('a') is False
 
     def test_has_key(self):
-        assert self.cache.has_key('a') == False
+        assert self.cache.has_key('a') is False
         self.cache.set('a', 1, None)
-        assert self.cache.has_key('a') == False
+        assert self.cache.has_key('a') is False
 
     def test_get_many(self):
         assert self.cache.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
     def test_set_many(self):
-        assert self.cache.set_many({'a': 1, 'b': 2, 'c': 3}.items(), None) is None
+        mapping = {'a': 1, 'b': 2, 'c': 3}.items()
+        assert self.cache.set_many(mapping, None) is None
         assert self.cache.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
 
     def test_delete_many(self):
@@ -67,39 +68,39 @@ class AbstractCacheTest:
 
         self.cache.set('a', 1)
         assert self.cache.get('a') == 1
-        assert self.cache.get_ttl('a') == None
+        assert self.cache.get_ttl('a') is None
 
         self.cache.set('a', 1, 20)
         assert self.cache.get_ttl('a') == 20
         assert self.cache.get('a') == 1
 
     def test_add(self):
-        assert self.cache.add('a', 1) == True
-        assert self.cache.add('a', 1) == False
+        assert self.cache.add('a', 1) is True
+        assert self.cache.add('a', 1) is False
 
-        assert self.cache.add('b', 2, 300) == True
-        assert self.cache.add('b', 2, 300) == False
+        assert self.cache.add('b', 2, 300) is True
+        assert self.cache.add('b', 2, 300) is False
 
     def test_delete(self):
-        assert self.cache.delete('a') == False
+        assert self.cache.delete('a') is False
 
         self.cache.set('a', 1)
-        assert self.cache.delete('a') == True
+        assert self.cache.delete('a') is True
         assert self.cache.get('a') is MISSING_KEY
 
         # Check so that if a key expires then deleting
         # should return False.
         self.cache.set('a', 1, 1)
         time.sleep(1)
-        assert self.cache.delete('a') == False
-        
+        assert self.cache.delete('a') is False
+
     def test_has_key(self):
-        assert self.cache.has_key('a') == False
+        assert self.cache.has_key('a') is False
         self.cache.set('a', 1)
-        assert self.cache.has_key('a') == True
+        assert self.cache.has_key('a') is True
         self.cache.set('a', 1, 1)
         time.sleep(1)
-        assert self.cache.has_key('a') == False
+        assert self.cache.has_key('a') is False
 
     def test_get_set_ttl(self):
         assert self.cache.get_ttl('a') is MISSING_KEY
