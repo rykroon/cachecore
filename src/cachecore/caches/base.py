@@ -8,16 +8,16 @@ class CacheInterface(Protocol):
 
     def get(self, key: str) -> Union[Any, MissingKey]:
         """
-            Returns the value associated with the key.
-            Returns MissingKey if key is not found.
+            Returns the value assigned to the key.
+            Returns MISSING_KEY if key is not found.
         """
         ...
 
     def set(self, key: str, value: Any, ttl: Optional[int]=None):
         """
-            Set the value of `value` to key `key`.
+            Assign a value to a key.
             The key will expire after `ttl` seconds.
-            The key will never expire if `ttl` is None
+            The key will never expire if `ttl` is None.
         """
         ...
 
@@ -26,8 +26,8 @@ class CacheInterface(Protocol):
 
     def delete(self, key: str) -> bool:
         """
-            Deletes the key
-            Returns True if a key was deleted, else False
+            Deletes the key.
+            Returns True if a key was deleted, else False.
         """
         ...
 
@@ -51,7 +51,7 @@ class CacheInterface(Protocol):
     def get_ttl(self, key: str) -> Union[int, None, MissingKey]:
         """
             Returns the TTL of the key.
-            Return None if key does not have a ttl
+            Returns None if key does not have a ttl.
             Returns MissingKey if the key does not exist.
         """
         ...
