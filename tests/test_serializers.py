@@ -1,7 +1,7 @@
 import pickle
 import unittest
 
-from cachecore.serializers import RedisSerializer, Serializer
+from cachecore.serializers import JSONSerializer, RedisSerializer, Serializer
 
 
 
@@ -9,6 +9,7 @@ class TestSerializerInterface(unittest.TestCase):
 
     def test_all(self):
         assert isinstance(pickle, Serializer)
+        assert issubclass(JSONSerializer, Serializer)
         assert issubclass(RedisSerializer, Serializer)
 
 
@@ -41,6 +42,15 @@ class TestRedisSerializer(AbstractSerializerTest):
 
         assert serializer.dumps(20) == 20
         assert serializer.loads(20) == 20
+
+
+class TestJSONSerializer(AbstractSerializerTest):
+    def test_dumps_loads(self):
+        serializer = JSONSerializer()
+
+        for value in self.values:
+            svalue = serializer.dumps(value)
+            assert serializer.loads(svalue) == value
 
 
 if __name__ == '__main__':
