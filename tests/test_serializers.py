@@ -37,11 +37,10 @@ class TestRedisSerializer(AbstractSerializerTest):
 
         for value in self.values:
             svalue = serializer.dumps(value)
-            assert type(svalue) in [bytes, int]
             assert serializer.loads(svalue) == value
 
-        assert serializer.dumps(20) == 20
-        assert serializer.loads(20) == 20
+        assert serializer.dumps(20) == b'20'
+        assert serializer.loads(b'20') == 20
 
 
 class TestJSONSerializer(AbstractSerializerTest):
