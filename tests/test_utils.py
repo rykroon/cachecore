@@ -13,13 +13,13 @@ class TestMissingKey(unittest.TestCase):
 class TestValue(unittest.TestCase):
     def test_value(self):
         v = Value(10, None)
-        assert v.get_ttl() is None
+        assert v.ttl is None
         assert v.is_expired() is False
 
-        v.set_ttl(1)
-        assert v.get_ttl() == 1
+        v.ttl = 1
+        assert v.ttl == 1
         time.sleep(1)
-        assert v.get_ttl() == 0
+        assert v.ttl == 0
         assert v.is_expired() is True
 
 
