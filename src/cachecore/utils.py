@@ -4,29 +4,20 @@ from pathlib import Path
 import time
 
 
-class Value:
+def ttl_to_exptime(ttl):
+    if ttl is None:
+        return None
+    return time.time() + ttl
 
-    """
-        A helper class for storing values with a TTL.
-    """
 
-    def __init__(self, value, expires_at=None):
-        self.value = value
-        self.expires_at = expires_at
+def ttl_remaining(exp_time):
+    if exp_time is None:
+        return None
+    return max(0, ceil(exp_time - time.time()))
 
-    @property
-    def ttl(self):
-        if self.expires_at is None:
-            return None
 
-        return max(0, ceil(self.expires_at - time.time()))
-
-    @ttl.setter
-    def ttl(self, ttl):
-        self.expires_at = None if ttl is None else time.time() + ttl
-
-    def is_expired(self):
-        return self.ttl == 0
+def is_expired(exp_time):
+    return ttl_remaining(exp_time) == 0
 
 
 class Directory:
