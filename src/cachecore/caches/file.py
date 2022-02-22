@@ -1,7 +1,9 @@
 from hashlib import md5
+from pathlib import Path
 import pickle
 
-from cachecore.utils import MISSING_KEY, Value, Directory
+from cachecore.utils import MISSING_KEY, ttl_to_exptime, ttl_remaining, \
+    is_expired
 
 
 class FileCache:
@@ -9,49 +11,61 @@ class FileCache:
     serializer = pickle
 
     def __init__(self, dir, ext='.cachecore'):
-        self._dir = Directory(dir)
+        self._dir = Path(dir)
+        if not self._dir.is_absolute():
+            self._dir = self._dir.resolve()
+
+        if self._dir.exists() and not self._dir.is_dir():
+            raise Exception
+
+        self._createdir()
         self._ext = ext
 
-    def _key_to_file(self, key):
+    def _createdir(self):
+        if not self._dir.exists():
+            self._dir.mkdir()
+
+    def _key_to_path(self, key):
         fname = md5(key.encode(), usedforsecurity=False).hexdigest()
         fname += self._ext
-        return fname
+        return self._dir / fname
 
-    def _get_value(self, key):
-        fname = self._key_to_file(key)
-        try:
-            value = self._dir[fname]
-        except KeyError:
-            return MISSING_KEY
+    def _read(self, path, exclude_value=False):
+        if not path.exists():
+            return MISSING_KEY, MISSING_KEY
 
-        value = self.serializer.loads(value)
-        if value.is_expired():
-            self._del_value(key)
-            return MISSING_KEY
+        with path.open('rb') as f:
+            line1 = f.readline()
+            line1 = line1.rstrip(b'\n')
+            expires_at = float(line1) if line1 else None
+            if is_expired(expires_at):
+                # delete file
+                return MISSING_KEY, MISSING_KEY
 
-        return value
+            ttl = ttl_remaining(expires_at)
+            if exclude_value:
+                return MISSING_KEY, ttl
+            
+            line2 = f.readline()
+            line2 = line2.rstrip(b'\n')
+            value = self.serializer.loads(line2)
+            return value, ttl
 
-    def _set_value(self, key, value):
-        fname = self._key_to_file(key)
-        self._dir[fname] = self.serializer.dumps(value)
-
-    def _del_value(self, key):
-        fname = self._key_to_file(key)
-        try:
-            del self._dir[fname]
-        except KeyError:
-            return False
-        return True
+    def _write(self, path, value, ttl):
+        value = self.serializer.dumps(value)
+        exptime = ttl_to_exptime(ttl)
+        exptime = str(exptime).encode() if exptime else b''
+        data = exptime + b'\n' + value + b'\n'
+        path.write_bytes(data)
 
     def get(self, key):
-        value = self._get_value(key)
-        if value is MISSING_KEY:
-            return MISSING_KEY
-        return value.value
+        path = self._key_to_path(key)
+        value, _ = self._read(path)
+        return value
 
     def set(self, key, value, ttl=None):
-        value = Value(value, ttl)
-        self._set_value(key, value)
+        path = self._key_to_path(key)
+        self._write(path, value, ttl)
 
     def add(self, key, value, ttl=None):
         if self.has_key(key):
@@ -62,10 +76,17 @@ class FileCache:
     def delete(self, key):
         if not self.has_key(key):
             return False
-        return self._del_value(key)
+        path = self._key_to_path(key)
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            return False
+        return True
 
     def has_key(self, key):
-        return self._get_value(key) is not MISSING_KEY
+        path = self._key_to_path(key)
+        _, ttl = self._read(path, exclude_value=True)
+        return ttl is not MISSING_KEY
 
     def get_many(self, *keys):
         return [self.get(k) for k in keys]
@@ -78,31 +99,33 @@ class FileCache:
         return [self.delete(k) for k in keys]
 
     def get_ttl(self, key):
-        value = self._get_value(key)
-        if value is MISSING_KEY:
-            return MISSING_KEY
-        return value.get_ttl()
+        path = self._key_to_path(key)
+        _, ttl = self._read(path, exclude_value=True)
+        return ttl
 
     def set_ttl(self, key, ttl=None):
-        value = self._get_value(key)
+        path = self._key_to_path(key)
+        value, _ = self._read(path)
         if value is not MISSING_KEY:
-            value.set_ttl(ttl)
-            self._set_value(key, value)
+            self._write(path, value, ttl)
 
     def incr(self, key, delta=1):
-        value = self._get_value(key)
-        if value is MISSING_KEY:
-            value = Value(0, None)
+        path = self._key_to_path(key)
+        value, ttl = self._read(path)
 
-        value.value += delta
-        self._set_value(key, value)
-        return value.value
+        if value is MISSING_KEY:
+            value = 0
+            ttl = None
+
+        value += delta
+        self._write(path, value, ttl)
+        return value
 
     def decr(self, key, delta=1):
         return self.incr(key, -delta)
 
     def clear(self):
-        for path in self._dir:
+        for path in self._dir.iterdir():
             if not path.is_file():
                 continue
 
