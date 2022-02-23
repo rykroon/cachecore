@@ -17,25 +17,50 @@ class RedisCache:
         import redis
         self._client = redis.Redis(**client_kwargs)
 
-    def get(self, key):
+    def __getitem__(self, key):
         value = self._client.get(key)
         if value is None:
-            return MISSING_KEY
+            raise KeyError(key)
         return self.serializer.loads(value)
 
-    def set(self, key, value, ttl=None):
+    def __setitem__(self, key, value):
+        ttl = None
+        if isinstance(value, tuple):
+            if len(value) == 2:
+                value, ttl = value
         value = self.serializer.dumps(value)
         self._client.set(key, value, ex=ttl)
+
+    def __delitem__(self, key):
+        result = bool(self._client.delete(key))
+        if not result:
+            raise KeyError(key)
+
+    def __contains__(self, key):
+        return bool(self._client.exists(key))
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def set(self, key, value, ttl=None):
+        self[key] = value, ttl
 
     def add(self, key, value, ttl=None):
         value = self.serializer.dumps(value)
         return self._client.set(key, value, ex=ttl, nx=True) is not None
 
     def delete(self, key):
-        return bool(self._client.delete(key))
+        try:
+            del self[key]
+            return True
+        except KeyError:
+            return False
 
     def has_key(self, key):
-        return bool(self._client.exists(key))
+        return key in self
 
     def get_many(self, *keys):
         values = self._client.mget(*keys)
