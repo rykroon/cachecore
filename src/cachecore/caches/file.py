@@ -1,4 +1,5 @@
 from hashlib import md5
+from math import exp
 from pathlib import Path
 import pickle
 
@@ -30,9 +31,13 @@ class FileCache:
         fname += self._ext
         return self._dir / fname
 
-    def _read(self, path, exclude_value=False):
+    def _read(self, path, incttl=False, incval=False):
+        # if include value is True, then include expiration time must be True
+        if incval:
+            incttl = True
+
         if not path.exists():
-            return MISSING_KEY, MISSING_KEY
+            return False, None, None
 
         with path.open('rb') as f:
             line1 = f.readline()
@@ -40,16 +45,20 @@ class FileCache:
             expires_at = float(line1) if line1 else None
             if is_expired(expires_at):
                 # delete file
-                return MISSING_KEY, MISSING_KEY
+                return False, None, None
+
+            if not incttl:
+                return True, None, None
 
             ttl = ttl_remaining(expires_at)
-            if exclude_value:
-                return MISSING_KEY, ttl
+
+            if not incval:
+                return True, ttl, None
             
             line2 = f.readline()
             line2 = line2.rstrip(b'\n')
             value = self.serializer.loads(line2)
-            return value, ttl
+            return True, ttl, value
 
     def _write(self, path, value, ttl):
         value = self.serializer.dumps(value)
@@ -60,7 +69,9 @@ class FileCache:
 
     def get(self, key):
         path = self._key_to_path(key)
-        value, _ = self._read(path)
+        exists, _, value = self._read(path, incval=True)
+        if not exists:
+            return MISSING_KEY
         return value
 
     def set(self, key, value, ttl=None):
@@ -85,8 +96,8 @@ class FileCache:
 
     def has_key(self, key):
         path = self._key_to_path(key)
-        _, ttl = self._read(path, exclude_value=True)
-        return ttl is not MISSING_KEY
+        exists, _, _ = self._read(path)
+        return exists
 
     def get_many(self, *keys):
         return [self.get(k) for k in keys]
@@ -100,20 +111,22 @@ class FileCache:
 
     def get_ttl(self, key):
         path = self._key_to_path(key)
-        _, ttl = self._read(path, exclude_value=True)
+        exists, ttl, _ = self._read(path, incttl=True)
+        if not exists:
+            return MISSING_KEY
         return ttl
 
     def set_ttl(self, key, ttl=None):
         path = self._key_to_path(key)
-        value, _ = self._read(path)
-        if value is not MISSING_KEY:
+        exists, _, value = self._read(path, incval=True)
+        if exists:
             self._write(path, value, ttl)
 
     def incr(self, key, delta=1):
         path = self._key_to_path(key)
-        value, ttl = self._read(path)
+        exists, ttl, value = self._read(path, incval=True)
 
-        if value is MISSING_KEY:
+        if not exists:
             value = 0
             ttl = None
 
