@@ -1,26 +1,12 @@
 import os
 import unittest
-import time
 
-from cachecore.utils import Value, MISSING_KEY, MissingKey, Directory
+from cachecore.utils import MISSING_KEY, MissingKey, Directory
 
 
 class TestMissingKey(unittest.TestCase):
     def test_missing_key(self):
         assert MISSING_KEY is MissingKey()
-
-
-class TestValue(unittest.TestCase):
-    def test_value(self):
-        v = Value(10, None)
-        assert v.ttl is None
-        assert v.is_expired() is False
-
-        v.ttl = 1
-        assert v.ttl == 1
-        time.sleep(1)
-        assert v.ttl == 0
-        assert v.is_expired() is True
 
 
 class TestDirectory(unittest.TestCase):
