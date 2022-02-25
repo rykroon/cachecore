@@ -1,5 +1,4 @@
 import pickle
-from typing import Union
 
 from cachecore.utils import MISSING_KEY, is_expired, \
     ttl_remaining, ttl_to_exptime
@@ -12,21 +11,27 @@ class LocalCache:
     def __init__(self):
         self._data = {}
 
-    def _read(self, key, exclude_value=False):
+    def _read(self, key, incttl=False, incval=False):
+        if incval:
+            incttl = True
+
         if key not in self._data:
-            return MISSING_KEY, MISSING_KEY
+            return False, None, None
 
         value, expires_at = self._data[key]
         if is_expired(expires_at):
             del self._data[key]
-            return MISSING_KEY, MISSING_KEY
+            return False, None, None
+
+        if not incttl:
+            return True, None, None
 
         ttl = ttl_remaining(expires_at)
-        if exclude_value:
-            return MISSING_KEY, ttl
+        if not incval:
+            return True, ttl, None
 
         value = self.serializer.loads(value)
-        return value, ttl
+        return True, ttl, value
 
     def _write(self, key, value, ttl):
         value = self.serializer.dumps(value)
@@ -34,7 +39,9 @@ class LocalCache:
         self._data[key] = [value, exp_time]
 
     def get(self, key):
-        value, _ = self._read(key)
+        exists, _, value = self._read(key, incval=True)
+        if not exists:
+            return MISSING_KEY
         return value
 
     def set(self, key, value, ttl=None):
@@ -53,8 +60,8 @@ class LocalCache:
         return True
 
     def has_key(self, key):
-        _, ttl = self._read(key, exclude_value=True)
-        return ttl is not MISSING_KEY
+        exists, _, _ = self._read(key)
+        return exists
 
     def get_many(self, *keys):
         return [self.get(k) for k in keys]
@@ -67,7 +74,9 @@ class LocalCache:
         return [self.delete(k) for k in keys]
 
     def get_ttl(self, key):
-        _, ttl = self._read(key, exclude_value=True)
+        exists, ttl, _ = self._read(key, incttl=True)
+        if not exists:
+            return MISSING_KEY
         return ttl
 
     def set_ttl(self, key, ttl=None):
@@ -77,8 +86,8 @@ class LocalCache:
         self._data[key][1] = exp_time
 
     def incr(self, key, delta=1):
-        value, ttl = self._read(key)
-        if value is MISSING_KEY:
+        exists, ttl, value = self._read(key, incval=True)
+        if not exists:
             value = 0
             ttl = None
 
