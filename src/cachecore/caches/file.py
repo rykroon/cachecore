@@ -44,7 +44,8 @@ class FileCache:
             line1 = line1.rstrip(b'\n')
             expires_at = float(line1) if line1 else None
             if is_expired(expires_at):
-                # delete file
+                f.close()
+                path.unlink(missing_ok=True)
                 return False, None, None
 
             if not incttl:
