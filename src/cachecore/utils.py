@@ -64,14 +64,3 @@ def singleton(class_):
     return class_
 
 
-@singleton
-class MissingKey:
-
-    def __bool__(self):
-        return False
-
-    def __repr__(self):
-        return 'MissingKey'
-
-
-MISSING_KEY = MissingKey()

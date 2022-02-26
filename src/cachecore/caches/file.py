@@ -3,8 +3,7 @@ from pathlib import Path
 import pickle
 
 from cachecore.caches import BaseCache
-from cachecore.utils import MISSING_KEY, ttl_to_exptime, ttl_remaining, \
-    is_expired
+from cachecore.utils import ttl_to_exptime, ttl_remaining, is_expired
 
 
 class FileCache(BaseCache):

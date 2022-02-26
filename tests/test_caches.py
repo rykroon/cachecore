@@ -9,7 +9,6 @@ from cachecore.caches import DummyCache
 from cachecore.caches import LocalCache
 from cachecore.caches import RedisCache
 from cachecore.caches import FileCache
-from cachecore.utils import MISSING_KEY
 
 
 class TestProtocol(unittest.TestCase):
@@ -66,7 +65,7 @@ class AbstractCacheTest:
 
     def test_get_set(self):
         assert self.cache.get('a') is None
-        assert self.cache.get('a', default=MISSING_KEY) is MISSING_KEY
+        assert self.cache.get('a', default=1) == 1
 
         self.cache.set('a', 1)
         assert self.cache.get('a') == 1

@@ -1,12 +1,7 @@
 import os
 import unittest
 
-from cachecore.utils import MISSING_KEY, MissingKey, Directory
-
-
-class TestMissingKey(unittest.TestCase):
-    def test_missing_key(self):
-        assert MISSING_KEY is MissingKey()
+from cachecore.utils import Directory
 
 
 class TestDirectory(unittest.TestCase):

@@ -1,8 +1,7 @@
 import pickle
 
 from cachecore.caches import BaseCache
-from cachecore.utils import MISSING_KEY, is_expired, \
-    ttl_remaining, ttl_to_exptime
+from cachecore.utils import is_expired, ttl_remaining, ttl_to_exptime
 
 
 class LocalCache(BaseCache):

@@ -1,4 +1,3 @@
-from cachecore.utils import MISSING_KEY
 from cachecore.caches import BaseCache
 
 
