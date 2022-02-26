@@ -54,11 +54,12 @@ class TestDummyCache(unittest.TestCase):
         assert self.cache.delete_many(['a', 'b', 'c']) == [False, False, False]
 
     def test_get_ttl(self):
-        assert self.cache.get_ttl('a') == MISSING_KEY
+        assert self.cache.get_ttl('a') == 0
+        assert self.cache.get_ttl('a', -1) == -1
         self.cache.set('a', 1)
-        assert self.cache.get_ttl('a') == MISSING_KEY
+        assert self.cache.get_ttl('a') == 0
         assert self.cache.set_ttl('a', 300) is False
-        assert self.cache.get_ttl('a') == MISSING_KEY
+        assert self.cache.get_ttl('a') == 0
 
 
 class AbstractCacheTest:
@@ -104,7 +105,8 @@ class AbstractCacheTest:
         assert self.cache.has_key('a') is False
 
     def test_get_set_ttl(self):
-        assert self.cache.get_ttl('a') is MISSING_KEY
+        assert self.cache.get_ttl('a') == 0
+        assert self.cache.get_ttl('a', -1) == -1
 
         self.cache.set('a', 1)
         assert self.cache.get_ttl('a') is None

@@ -77,10 +77,10 @@ class RedisCache:
             pipeline.delete(k)
         return [bool(result) for result in pipeline.execute()]
 
-    def get_ttl(self, key):
+    def get_ttl(self, key, default=0):
         result = self._client.ttl(key)
         if result == -2:
-            return MISSING_KEY
+            return default
 
         if result == -1:
             return None

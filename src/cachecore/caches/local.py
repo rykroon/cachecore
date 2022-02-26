@@ -43,9 +43,9 @@ class LocalCache(BaseCache):
         exp_time = ttl_to_exptime(ttl)
         self._data[key] = [value, exp_time]
 
-    def get_ttl(self, key):
+    def get_ttl(self, key, default=0):
         if key not in self:
-            return MISSING_KEY
+            return default
         return ttl_remaining(self._data[key][1])
 
     def set_ttl(self, key, ttl=None):

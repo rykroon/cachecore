@@ -19,8 +19,8 @@ class DummyCache(BaseCache):
     def set(self, key, value, ttl=None):
         pass
 
-    def get_ttl(self, key):
-        return MISSING_KEY
+    def get_ttl(self, key, default=0):
+        return default
 
     def set_ttl(self, key, ttl=None):
         return False

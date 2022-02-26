@@ -60,11 +60,11 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def get_ttl(self, key: str) -> Union[int, None, MissingKey]:
+    def get_ttl(self, key: str, default: Any = 0) -> Optional[int]:
         """
             Returns the TTL of the key.
             Returns None if key does not have a ttl.
-            Returns MissingKey if the key does not exist.
+            Returns default if the key does not exist.
         """
         ...
 

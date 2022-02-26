@@ -98,11 +98,11 @@ class FileCache(BaseCache):
         path = self._key_to_path(key)
         self._write(path, value, ttl)
 
-    def get_ttl(self, key):
+    def get_ttl(self, key, default=0):
         path = self._key_to_path(key)
         exists, ttl, _ = self._read(path, incttl=True)
         if not exists:
-            return MISSING_KEY
+            return default
         return ttl
 
     def set_ttl(self, key, ttl=None):
