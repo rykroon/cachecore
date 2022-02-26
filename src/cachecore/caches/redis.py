@@ -62,9 +62,9 @@ class RedisCache:
     def has_key(self, key):
         return key in self
 
-    def get_many(self, *keys):
+    def get_many(self, keys):
         values = self._client.mget(*keys)
-        return [MISSING_KEY if v is None else self.serializer.loads(v) for v in values]
+        return [None if v is None else self.serializer.loads(v) for v in values]
 
     def set_many(self, mapping, ttl=None):
         pipeline = self._client.pipeline()
@@ -74,7 +74,7 @@ class RedisCache:
 
         pipeline.execute()
 
-    def delete_many(self, *keys):
+    def delete_many(self, keys):
         pipeline = self._client.pipeline()
         for k in keys:
             pipeline.delete(k)

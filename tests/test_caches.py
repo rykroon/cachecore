@@ -26,11 +26,11 @@ class TestDummyCache(unittest.TestCase):
         self.cache = DummyCache()
 
     def test_get(self):
-        assert self.cache.get('a') is MISSING_KEY
+        assert self.cache.get('a') is None
 
     def test_set(self):
         assert self.cache.set('a', 1, None) is None
-        assert self.cache.get('a') is MISSING_KEY
+        assert self.cache.get('a') is None
 
     def test_delete(self):
         assert self.cache.delete('a') is False
@@ -43,15 +43,15 @@ class TestDummyCache(unittest.TestCase):
         assert self.cache.has_key('a') is False
 
     def test_get_many(self):
-        assert self.cache.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
+        assert self.cache.get_many(['a', 'b', 'c']) == [None] * 3
 
     def test_set_many(self):
         mapping = {'a': 1, 'b': 2, 'c': 3}.items()
         assert self.cache.set_many(mapping, None) is None
-        assert self.cache.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
+        assert self.cache.get_many(['a', 'b', 'c']) == [None] * 3
 
     def test_delete_many(self):
-        assert self.cache.delete_many('a', 'b', 'c') == [False, False, False]
+        assert self.cache.delete_many(['a', 'b', 'c']) == [False, False, False]
 
     def test_get_ttl(self):
         assert self.cache.get_ttl('a') == MISSING_KEY
@@ -64,7 +64,8 @@ class TestDummyCache(unittest.TestCase):
 class AbstractCacheTest:
 
     def test_get_set(self):
-        assert self.cache.get('a') is MISSING_KEY
+        assert self.cache.get('a') is None
+        assert self.cache.get('a', default=MISSING_KEY) is MISSING_KEY
 
         self.cache.set('a', 1)
         assert self.cache.get('a') == 1
@@ -86,7 +87,7 @@ class AbstractCacheTest:
 
         self.cache.set('a', 1)
         assert self.cache.delete('a') is True
-        assert self.cache.get('a') is MISSING_KEY
+        assert self.cache.get('a') is None
 
         # Check so that if a key expires then deleting
         # should return False.
@@ -113,22 +114,22 @@ class AbstractCacheTest:
         assert self.cache.get_ttl('a') == 299
 
     def test_get_set_many(self):
-        assert self.cache.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
+        assert self.cache.get_many(['a', 'b', 'c']) == [None] * 3
 
         self.cache.set_many([('a', 1), ('b', 2), ('c', 3)])
-        assert self.cache.get_many('a', 'b', 'c') == [1, 2, 3]
+        assert self.cache.get_many(['a', 'b', 'c']) == [1, 2, 3]
         for k in ['a', 'b', 'c']:
             assert self.cache.get_ttl(k) is None
 
         self.cache.set_many({'a': 1, 'b': 2, 'c': 3}.items(), 300)
-        assert self.cache.get_many('a', 'b', 'c') == [1, 2, 3]
+        assert self.cache.get_many(['a', 'b', 'c']) == [1, 2, 3]
         for k in ['a', 'b', 'c']:
             assert self.cache.get_ttl(k) == 300
 
     def test_delete_many(self):
         self.cache.set_many({'a': 1, 'b': 2, 'c': 3}.items())
-        assert self.cache.delete_many('a', 'b', 'c') == [True] * 3
-        assert self.cache.get_many('a', 'b', 'c') == [MISSING_KEY] * 3
+        assert self.cache.delete_many(['a', 'b', 'c']) == [True] * 3
+        assert self.cache.get_many(['a', 'b', 'c']) == [None] * 3
 
     def test_incr_decr(self):
         assert self.cache.incr('a') == 1

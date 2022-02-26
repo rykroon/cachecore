@@ -6,10 +6,22 @@ from cachecore.utils import MissingKey
 @runtime_checkable
 class CacheInterface(Protocol):
 
-    def get(self, key: str) -> Union[Any, MissingKey]:
+    def __getitem__(self, key: str) -> Any:
+        ...
+
+    def __setitem__(self, key: str, value: Any):
+        ...
+
+    def __delitem__(self, key: str):
+        ...
+
+    def __contains__(self, key: str):
+        ...
+
+    def get(self, key: str, default: Any = None) -> Any:
         """
             Returns the value assigned to the key.
-            Returns MISSING_KEY if key is not found.
+            Returns default if key is not found.
         """
         ...
 
@@ -70,3 +82,41 @@ class CacheInterface(Protocol):
 
     def clear(self):
         ...
+
+
+class BaseCache:
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def add(self, key, value, ttl=None):
+        if self.has_key(key):
+            return False
+        self.set(key, value, ttl)
+        return True
+
+    def delete(self, key):
+        try:
+            del self[key]
+        except KeyError:
+            return False
+        return True
+
+    def has_key(self, key):
+        return key in self
+
+    def get_many(self, keys, default=None):
+        return [self.get(k, default) for k in keys]
+
+    def set_many(self, mapping, ttl=None):
+        for k, v in mapping:
+            self.set(k, v, ttl)
+
+    def delete_many(self, keys):
+        return [self.delete(k) for k in keys]
+
+    def decr(self, key, delta=1):
+        return self.incr(key, -delta)

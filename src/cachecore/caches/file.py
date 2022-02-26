@@ -1,13 +1,13 @@
 from hashlib import md5
-from math import exp
 from pathlib import Path
 import pickle
 
+from cachecore.caches import BaseCache
 from cachecore.utils import MISSING_KEY, ttl_to_exptime, ttl_remaining, \
     is_expired
 
 
-class FileCache:
+class FileCache(BaseCache):
 
     serializer = pickle
 
@@ -21,6 +21,36 @@ class FileCache:
 
         self._createdir()
         self._ext = ext
+
+    def __getitem__(self, key):
+        path = self._key_to_path(key)
+        exists, _, value = self._read(path, incval=True)
+        if not exists:
+            raise KeyError(key)
+        return value
+
+    def __setitem__(self, key, value):
+        ttl = None
+        if isinstance(value, tuple):
+            if len(value) == 2:
+                value, ttl = value
+        path = self._key_to_path(key)
+        self._write(path, value, ttl)
+
+    def __delitem__(self, key):
+        if not self.has_key(key):
+            raise KeyError(key)
+
+        path = self._key_to_path(key)
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            raise KeyError(key)
+
+    def __contains__(self, key):
+        path = self._key_to_path(key)
+        exists, _, _ = self._read(path)
+        return exists
 
     def _createdir(self):
         if not self._dir.exists():
@@ -68,47 +98,8 @@ class FileCache:
         data = exptime + b'\n' + value + b'\n'
         path.write_bytes(data)
 
-    def get(self, key):
-        path = self._key_to_path(key)
-        exists, _, value = self._read(path, incval=True)
-        if not exists:
-            return MISSING_KEY
-        return value
-
     def set(self, key, value, ttl=None):
-        path = self._key_to_path(key)
-        self._write(path, value, ttl)
-
-    def add(self, key, value, ttl=None):
-        if self.has_key(key):
-            return False
-        self.set(key, value, ttl)
-        return True
-
-    def delete(self, key):
-        if not self.has_key(key):
-            return False
-        path = self._key_to_path(key)
-        try:
-            path.unlink()
-        except FileNotFoundError:
-            return False
-        return True
-
-    def has_key(self, key):
-        path = self._key_to_path(key)
-        exists, _, _ = self._read(path)
-        return exists
-
-    def get_many(self, *keys):
-        return [self.get(k) for k in keys]
-
-    def set_many(self, mapping, ttl=None):
-        for k, v in mapping:
-            self.set(k, v, ttl)
-
-    def delete_many(self, *keys):
-        return [self.delete(k) for k in keys]
+        self[key] = value, ttl
 
     def get_ttl(self, key):
         path = self._key_to_path(key)
@@ -134,9 +125,6 @@ class FileCache:
         value += delta
         self._write(path, value, ttl)
         return value
-
-    def decr(self, key, delta=1):
-        return self.incr(key, -delta)
 
     def clear(self):
         for path in self._dir.iterdir():
