@@ -23,7 +23,7 @@ class DummyCache(BaseCache):
         return MISSING_KEY
 
     def set_ttl(self, key, ttl=None):
-        pass
+        return False
 
     def incr(self, key, delta=1):
         return delta

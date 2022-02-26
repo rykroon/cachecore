@@ -19,14 +19,8 @@ class LocalCache(BaseCache):
         return self.serializer.loads(value)
 
     def __setitem__(self, key, value):
-        ttl = None
-        if isinstance(value, tuple):
-            if len(value) == 2:
-                value, ttl = value
-
         value = self.serializer.dumps(value)
-        exp_time = ttl_to_exptime(ttl)
-        self._data[key] = [value, exp_time]
+        self._data[key] = [value, None]
 
     def __delitem__(self, key):
         if key not in self:
@@ -45,7 +39,9 @@ class LocalCache(BaseCache):
         return True
 
     def set(self, key, value, ttl=None):
-        self[key] = value, ttl
+        value = self.serializer.dumps(value)
+        exp_time = ttl_to_exptime(ttl)
+        self._data[key] = [value, exp_time]
 
     def get_ttl(self, key):
         if key not in self:
@@ -54,9 +50,10 @@ class LocalCache(BaseCache):
 
     def set_ttl(self, key, ttl=None):
         if not self.has_key(key):
-            return
+            return False
         exp_time = ttl_to_exptime(ttl)
         self._data[key][1] = exp_time
+        return True
 
     def incr(self, key, delta=1):
         if key not in self:

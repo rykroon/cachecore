@@ -68,9 +68,10 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def set_ttl(self, key: str, ttl: Optional[int]=None):
+    def set_ttl(self, key: str, ttl: Optional[int]=None) -> bool:
         """
             Sets the TTL of the key.
+            Returns True or False if the TTL was set.
         """
         ...
 

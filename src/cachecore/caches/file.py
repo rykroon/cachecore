@@ -30,12 +30,8 @@ class FileCache(BaseCache):
         return value
 
     def __setitem__(self, key, value):
-        ttl = None
-        if isinstance(value, tuple):
-            if len(value) == 2:
-                value, ttl = value
         path = self._key_to_path(key)
-        self._write(path, value, ttl)
+        self._write(path, value, None)
 
     def __delitem__(self, key):
         if not self.has_key(key):
@@ -99,7 +95,8 @@ class FileCache(BaseCache):
         path.write_bytes(data)
 
     def set(self, key, value, ttl=None):
-        self[key] = value, ttl
+        path = self._key_to_path(key)
+        self._write(path, value, ttl)
 
     def get_ttl(self, key):
         path = self._key_to_path(key)
@@ -111,8 +108,10 @@ class FileCache(BaseCache):
     def set_ttl(self, key, ttl=None):
         path = self._key_to_path(key)
         exists, _, value = self._read(path, incval=True)
-        if exists:
-            self._write(path, value, ttl)
+        if not exists:
+            return False
+        self._write(path, value, ttl)
+        return True
 
     def incr(self, key, delta=1):
         path = self._key_to_path(key)

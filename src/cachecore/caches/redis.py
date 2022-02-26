@@ -24,12 +24,8 @@ class RedisCache:
         return self.serializer.loads(value)
 
     def __setitem__(self, key, value):
-        ttl = None
-        if isinstance(value, tuple):
-            if len(value) == 2:
-                value, ttl = value
         value = self.serializer.dumps(value)
-        self._client.set(key, value, ex=ttl)
+        self._client.set(key, value)
 
     def __delitem__(self, key):
         result = bool(self._client.delete(key))
@@ -46,7 +42,8 @@ class RedisCache:
             return default
 
     def set(self, key, value, ttl=None):
-        self[key] = value, ttl
+        value = self.serializer.dumps(value)
+        self._client.set(key, value, ex=ttl)
 
     def add(self, key, value, ttl=None):
         value = self.serializer.dumps(value)
@@ -92,9 +89,16 @@ class RedisCache:
 
     def set_ttl(self, key, ttl=None):
         if ttl is None:
-            self._client.persist(key)
-        else:
-            self._client.expire(key, ttl)
+            pipeline = self._client.pipeline()
+            # persist returns False if either the key does not exist
+            # OR if the key is already persisted. So we need to return 
+            # the result of exists.
+            pipeline.persist(key) 
+            pipeline.exists(key)
+            _, exists = pipeline.execute()
+            return bool(exists)
+
+        return bool(self._client.expire(key, ttl))
 
     def incr(self, key, delta=1):
         return self._client.incr(key, delta)
