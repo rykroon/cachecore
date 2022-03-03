@@ -45,7 +45,7 @@ class CacheInterface(Protocol):
     def has_key(self, key: str) -> bool:
         ...
 
-    def get_many(self, keys: list[str]) -> list[Any]:
+    def get_many(self, keys: list[str], default: Any = None) -> list[Any]:
         ...
 
     def set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int]=None):

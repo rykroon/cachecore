@@ -58,9 +58,9 @@ class RedisCache:
     def has_key(self, key):
         return key in self
 
-    def get_many(self, keys):
+    def get_many(self, keys, default=None):
         values = self._client.mget(*keys)
-        return [None if v is None else self.serializer.loads(v) for v in values]
+        return [default if v is None else self.serializer.loads(v) for v in values]
 
     def set_many(self, mapping, ttl=None):
         pipeline = self._client.pipeline()
