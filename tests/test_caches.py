@@ -78,6 +78,12 @@ class TestDummyCache(unittest.TestCase):
         assert self.cache.set_ttl('a', 300) is False
         assert self.cache.get_ttl('a') == 0
 
+    def test_incr_decr(self):
+        assert self.cache.incr('a') == 1
+        assert self.cache.incr('a', 20) == 20
+        assert self.cache.decr('a') == -1
+        assert self.cache.decr('a', 20) == -20
+
 
 class AbstractCacheTest:
 
@@ -167,12 +173,17 @@ class AbstractCacheTest:
         assert self.cache.delete_many(['a', 'b', 'c']) == [True] * 3
         assert self.cache.get_many(['a', 'b', 'c']) == [None] * 3
 
-    def test_incr_decr(self):
+    def test_incr(self):
         assert self.cache.incr('a') == 1
-        assert self.cache.incr('b', 20) == 20
+        assert self.cache.incr('a') == 2
+        assert self.cache.incr('b', 10) == 10
+        assert self.cache.incr('b', 10) == 20
 
-        assert self.cache.decr('a') == 0
-        assert self.cache.decr('b', 5) == 15
+    def test_decr(self):
+        assert self.cache.decr('a') == -1
+        assert self.cache.decr('a') == -2
+        assert self.cache.decr('b', 10) == -10
+        assert self.cache.decr('b', 10) == -20
 
     def test_clear(self):
         self.cache.set_many([('a', 1), ('b', 2), ('c', 3)])
