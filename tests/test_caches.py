@@ -49,6 +49,10 @@ class TestDummyCache(unittest.TestCase):
         assert self.cache.set('a', 1, None) is None
         assert self.cache.get('a') is None
 
+    def test_add_replace(self):
+        assert self.cache.add('a', 1) is True
+        assert self.cache.replace('a', 1) is False
+
     def test_delete(self):
         assert self.cache.delete('a') is False
         self.cache.set('a', 1, None)
@@ -121,6 +125,13 @@ class AbstractCacheTest:
         assert self.cache.add('b', 2, 300) is True
         assert self.cache.add('b', 2, 300) is False
 
+    def test_replace(self):
+        assert self.cache.replace('a', 1) is False
+        assert not self.cache.has_key('a')
+        self.cache.set('a', 1)
+        assert self.cache.replace('a', 2) is True
+        assert self.cache.get('a') == 2
+
     def test_delete(self):
         assert self.cache.delete('a') is False
 
@@ -133,6 +144,12 @@ class AbstractCacheTest:
         self.cache.set('a', 1, 1)
         time.sleep(1)
         assert self.cache.delete('a') is False
+
+    def test_pop(self):
+        assert self.cache.pop('a') is None
+        self.cache.set('a', 1)
+        assert self.cache.pop('a') == 1
+        assert not self.cache.has_key('a')
 
     def test_has_key(self):
         assert self.cache.has_key('a') is False
