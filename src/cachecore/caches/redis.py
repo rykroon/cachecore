@@ -46,7 +46,11 @@ class RedisCache:
 
     def add(self, key, value, ttl=None):
         value = self.serializer.dumps(value)
-        return self._client.set(key, value, ex=ttl, nx=True) is not None
+        return bool(self._client.set(key, value, ex=ttl, nx=True))
+
+    def replace(self, key, value, ttl=None):
+        value = self.serializer.dumps(value)
+        return bool(self._client.set(key, value, ex=ttl, xx=True))
 
     def delete(self, key):
         try:
@@ -54,6 +58,15 @@ class RedisCache:
             return True
         except KeyError:
             return False
+
+    def pop(self, key, default=None):
+        p = self._client.pipeline()
+        p.get(key)
+        p.delete(key)
+        value, _ = p.execute()
+        if value is None:
+            return default
+        return self.serializer.loads(value)
 
     def has_key(self, key):
         return key in self

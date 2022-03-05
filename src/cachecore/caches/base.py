@@ -1,5 +1,8 @@
 from collections.abc import Iterable
+from lib2to3.pgen2.token import OP
 from typing import Any, Optional, Protocol, runtime_checkable
+
+from cachecore.utils import NOT_PASSED
 
 
 @runtime_checkable
@@ -17,7 +20,7 @@ class CacheInterface(Protocol):
     def __contains__(self, key: str):
         ...
 
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self, key: str, default: Any=None) -> Any:
         """
             Returns the value assigned to the key.
             Returns default if key is not found.
@@ -33,12 +36,29 @@ class CacheInterface(Protocol):
         ...
 
     def add(self, key: str, value: Any, ttl: Optional[int]=None) -> bool:
+        """
+            Set the key only if it doesn't already exist.
+        """
         ...
+
+    def replace(self, key: str, value: Any, ttl: Optional[int]=None) -> bool:
+        """
+            Set the key only if it already exists.
+        """
+        ...
+
 
     def delete(self, key: str) -> bool:
         """
             Deletes the key.
             Returns True if a key was deleted, else False.
+        """
+        ...
+
+    def pop(self, key: str, default: Any=None):
+        """
+            Deletes the key and returns the corresponding value.
+            If the key is missing raises a KeyError.
         """
         ...
 
@@ -98,12 +118,23 @@ class BaseCache:
         self.set(key, value, ttl)
         return True
 
+    def replace(self, key, value, ttl=None):
+        if not self.has_key(key):
+            return False
+        self.set(key, value, ttl)
+        return True
+
     def delete(self, key):
         try:
             del self[key]
         except KeyError:
             return False
         return True
+
+    def pop(self, key, default=None):
+        value = self.get(key, default)
+        self.delete(key)
+        return value
 
     def has_key(self, key):
         return key in self
