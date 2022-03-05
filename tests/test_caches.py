@@ -1,6 +1,8 @@
 import os
-import unittest
+import string
 import time
+import unittest
+
 
 import redis
 
@@ -105,6 +107,27 @@ class AbstractCacheTest:
 
         self.cache['a'] = 1
         del self.cache['a']
+
+    def test_iter(self):
+        letters = [char for char in string.ascii_letters]
+        data = dict.fromkeys(letters)
+        self.cache.set_many(data.items())
+
+        for key in self.cache:
+            assert key in letters
+
+    def test_keys(self):
+        pattern = 'h*llo'
+        self.cache.set_many(
+            (
+                ('hello', None),
+                ('hallo', None),
+                ('HELLO', None),
+                ('world', None)
+            )
+        )
+        for key in self.cache.keys(pattern):
+            assert key in ('hello', 'hallo', 'HELLO')
 
     def test_get_set(self):
         assert self.cache.get('a') is None
@@ -224,6 +247,14 @@ class TestFileCache(unittest.TestCase, AbstractCacheTest):
             if fname.endswith('.cachecore'):
                 fpath = os.path.join(dir, fname)
                 os.remove(fpath)
+
+    def test_iter(self):
+        with self.assertRaises(NotImplementedError):
+            iter(self.cache)
+
+    def test_keys(self):
+        with self.assertRaises(NotImplementedError):
+            iter(self.cache)
 
 
 class TestRedisCache(unittest.TestCase, AbstractCacheTest):

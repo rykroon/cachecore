@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from fnmatch import fnmatch
 from typing import Any, Optional, Protocol, runtime_checkable
 
 
@@ -21,6 +22,9 @@ class CacheInterface(Protocol):
         ...
 
     def __len__(self):
+        ...
+
+    def keys(self, pattern: str=None):
         ...
 
     def get(self, key: str, default: Any=None) -> Any:
@@ -81,7 +85,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def get_ttl(self, key: str, default: Any = 0) -> Optional[int]:
+    def get_ttl(self, key: str, default: int=0) -> Optional[int]:
         """
             Returns the TTL of the key.
             Returns None if key does not have a ttl.
@@ -109,7 +113,14 @@ class CacheInterface(Protocol):
 class BaseCache:
 
     def __len__(self):
-        return len(list(iter(self)))
+        return len(list(self))
+
+    def keys(self, pattern=None):
+        for key in self:
+            if pattern is not None:
+                if not fnmatch(key, pattern):
+                    continue
+            yield key
 
     def get(self, key, default=None):
         try:
