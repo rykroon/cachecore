@@ -35,14 +35,35 @@ class RedisCache:
         return bool(self._client.exists(key))
 
     def __iter__(self):
-        cursor = -1
-        while cursor != 0:
-            cursor, keys = self._client.scan(cursor)
-            for key in keys:
-                yield key
+        return self._scan()
 
     def __len__(self):
-        ...
+        return len(list(self))
+
+    def _scan(self, match=None, count=None):
+        """
+            https://redis.io/commands/scan
+            "A given element may be returned multiple times. It is up to
+            the application to handle the case of duplicated elements, for
+            example only using the returned elements in order to perform
+            operations that are safe when re-applied multiple times."
+        """
+        key_set = set()
+        cursor = -1
+        while cursor != 0:
+            cursor, keys = self._client.scan(
+                cursor=cursor, 
+                match=match, 
+                count=count
+            )
+            for key in keys:
+                if key in key_set:
+                    continue
+                key_set.add(key)
+                yield key
+
+    def keys(self, pattern=None):
+        return self._scan(match=pattern)
 
     def get(self, key, default=None):
         try:
