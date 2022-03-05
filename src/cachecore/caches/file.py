@@ -84,7 +84,7 @@ class FileCache(BaseCache):
             if not incval:
                 return True, ttl, None
             
-            line2 = f.readline()
+            line2 = f.read() # do not do readline() some serializers may have new line characters.
             line2 = line2.rstrip(b'\n')
             value = self.serializer.loads(line2)
             return True, ttl, value
