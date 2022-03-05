@@ -54,6 +54,16 @@ class FileCache(BaseCache):
         if not self._dir.exists():
             self._dir.mkdir()
 
+    def _iterdir(self):
+        for path in self._dir.iterdir():
+            if not path.is_file():
+                continue
+
+            if not path.name.endswith(self._ext):
+                continue
+
+            yield path
+
     def _key_to_path(self, key):
         fname = md5(key.encode(), usedforsecurity=False).hexdigest()
         fname += self._ext
@@ -128,11 +138,5 @@ class FileCache(BaseCache):
         return value
 
     def clear(self):
-        for path in self._dir.iterdir():
-            if not path.is_file():
-                continue
-
-            if not path.name.endswith(self._ext):
-                continue
-
+        for path in self._iterdir():
             path.unlink(missing_ok=True)
