@@ -1,5 +1,5 @@
-from cachecore.caches.base import CacheInterface, BaseCache
-from cachecore.caches.dummy import DummyCache
-from cachecore.caches.file import FileCache
-from cachecore.caches.local import LocalCache
-from cachecore.caches.redis import RedisCache
+from .base import CacheInterface, BaseCache
+from .dummy import DummyCache
+from .file import FileCache
+from .local import LocalCache
+from .redis import RedisCache

@@ -2,8 +2,8 @@ from hashlib import md5
 from pathlib import Path
 import pickle
 
-from cachecore.caches import BaseCache
-from cachecore.utils import ttl_to_exptime, ttl_remaining, is_expired
+from .base import BaseCache
+from ..utils import ttl_to_exptime, ttl_remaining, is_expired
 
 
 class FileCache(BaseCache):
@@ -46,6 +46,9 @@ class FileCache(BaseCache):
         path = self._key_to_path(key)
         exists, _, _ = self._read(path)
         return exists
+
+    def __iter__(self):
+        raise NotImplementedError
 
     def _createdir(self):
         if not self._dir.exists():

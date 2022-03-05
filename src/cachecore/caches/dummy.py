@@ -1,4 +1,4 @@
-from cachecore.caches import BaseCache
+from .base import BaseCache
 
 
 class DummyCache(BaseCache):
@@ -14,6 +14,9 @@ class DummyCache(BaseCache):
 
     def __contains__(self, key):
         return False
+
+    def __iter__(self):
+        return iter([])
 
     def set(self, key, value, ttl=None):
         pass

@@ -1,7 +1,7 @@
 import pickle
 
-from cachecore.caches import BaseCache
-from cachecore.utils import is_expired, ttl_remaining, ttl_to_exptime
+from .base import BaseCache
+from ..utils import is_expired, ttl_remaining, ttl_to_exptime
 
 
 class LocalCache(BaseCache):
@@ -36,6 +36,12 @@ class LocalCache(BaseCache):
             return False
 
         return True
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
 
     def set(self, key, value, ttl=None):
         value = self.serializer.dumps(value)

@@ -1,4 +1,4 @@
-from cachecore.serializers import RedisSerializer
+from ..serializers import RedisSerializer
 
 
 class RedisCache:
@@ -33,6 +33,16 @@ class RedisCache:
 
     def __contains__(self, key):
         return bool(self._client.exists(key))
+
+    def __iter__(self):
+        cursor = -1
+        while cursor != 0:
+            cursor, keys = self._client.scan(cursor)
+            for key in keys:
+                yield key
+
+    def __len__(self):
+        ...
 
     def get(self, key, default=None):
         try:

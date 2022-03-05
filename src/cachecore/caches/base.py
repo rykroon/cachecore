@@ -17,6 +17,12 @@ class CacheInterface(Protocol):
     def __contains__(self, key: str):
         ...
 
+    def __iter__(self):
+        ...
+
+    def __len__(self):
+        ...
+
     def get(self, key: str, default: Any=None) -> Any:
         """
             Returns the value assigned to the key.
@@ -102,6 +108,9 @@ class CacheInterface(Protocol):
 
 
 class BaseCache:
+
+    def __len__(self):
+        return len(list(iter(self)))
 
     def get(self, key, default=None):
         try:

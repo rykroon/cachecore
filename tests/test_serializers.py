@@ -1,7 +1,7 @@
 import pickle
 import unittest
 
-from cachecore.serializers import JSONSerializer, RedisSerializer, Serializer
+from src.cachecore.serializers import JSONSerializer, RedisSerializer, Serializer
 
 
 

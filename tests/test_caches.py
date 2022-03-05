@@ -4,11 +4,11 @@ import time
 
 import redis
 
-from cachecore.caches import CacheInterface
-from cachecore.caches import DummyCache
-from cachecore.caches import LocalCache
-from cachecore.caches import RedisCache
-from cachecore.caches import FileCache
+from src.cachecore.caches import CacheInterface
+from src.cachecore.caches import DummyCache
+from src.cachecore.caches import LocalCache
+from src.cachecore.caches import RedisCache
+from src.cachecore.caches import FileCache
 
 
 class TestProtocol(unittest.TestCase):
@@ -23,6 +23,24 @@ class TestDummyCache(unittest.TestCase):
 
     def setUp(self):
         self.cache = DummyCache()
+
+    def test_getitem(self):
+        with self.assertRaises(KeyError):
+            self.cache['a']
+
+    def test_setitem(self):
+        self.cache['a'] = 1
+        with self.assertRaises(KeyError):
+            self.cache['a']
+
+    def test_delitem(self):
+        with self.assertRaises(KeyError):
+            del self.cache['a']
+
+        self.cache['a'] = 1
+
+        with self.assertRaises(KeyError):
+            del self.cache['a']
 
     def test_get(self):
         assert self.cache.get('a') is None
@@ -62,6 +80,21 @@ class TestDummyCache(unittest.TestCase):
 
 
 class AbstractCacheTest:
+
+    def test_getsetitem(self):
+        with self.assertRaises(KeyError):
+            self.cache['a']
+
+        self.cache['a'] = 1
+
+        assert self.cache['a'] == 1
+
+    def test_delitem(self):
+        with self.assertRaises(KeyError):
+            del self.cache['a']
+
+        self.cache['a'] = 1
+        del self.cache['a']
 
     def test_get_set(self):
         assert self.cache.get('a') is None
