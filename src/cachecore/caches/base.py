@@ -61,7 +61,6 @@ class CacheInterface(Protocol):
     def pop(self, key: str, default: Any=None):
         """
             Deletes the key and returns the corresponding value.
-            If the key is missing raises a KeyError.
         """
         ...
 
