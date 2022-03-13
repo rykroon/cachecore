@@ -1,3 +1,5 @@
+from functools import cached_property
+
 from ..serializers import RedisSerializer
 
 
@@ -39,6 +41,13 @@ class RedisCache:
 
     def __len__(self):
         return len(list(self))
+
+    @cached_property
+    def _redis_version(self):
+        info = self._client.info()
+        version = info['redis_version']
+        version = (int(n) for n in version.split('.'))
+        return tuple(version)
 
     def _scan(self, match=None, count=None):
         """
@@ -91,6 +100,13 @@ class RedisCache:
             return False
 
     def pop(self, key, default=None):
+        # GETDEL is available since 6.2.0
+        if self._redis_version >= (6, 2, 0):
+            value = self._client.getdel(key)
+            if value is None:
+                return default
+            return self.serializer.loads(value)
+
         p = self._client.pipeline()
         p.get(key)
         p.delete(key)
