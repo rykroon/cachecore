@@ -18,7 +18,7 @@ class FileCache(BaseCache):
         if self._dir.exists() and not self._dir.is_dir():
             raise Exception
 
-        self._createdir()
+        self._mkdir()
         self._ext = ext
 
     def __getitem__(self, key):
@@ -52,7 +52,10 @@ class FileCache(BaseCache):
             fname = path.name.rstrip(self._ext)
             yield b32decode(fname).decode()
 
-    def _createdir(self):
+    def __len__(self):
+        return len(list(self._iterdir()))
+
+    def _mkdir(self):
         if not self._dir.exists():
             self._dir.mkdir()
 
@@ -76,9 +79,7 @@ class FileCache(BaseCache):
             return False, None, None
 
         with path.open('rb') as f:
-            line1 = f.readline()
-            line1 = line1.rstrip(b'\n')
-            expires_at = float(line1) if line1 else None
+            expires_at = self.serializer.load(f)
             if is_expired(expires_at):
                 f.close()
                 path.unlink(missing_ok=True)
@@ -86,17 +87,14 @@ class FileCache(BaseCache):
 
             if not incval:
                 return True, expires_at, None
-            
-            line2 = f.read() # do not do readline() some serializers may have new line characters.
-            line2 = line2.rstrip(b'\n')
-            value = self.serializer.loads(line2)
+
+            value = self.serializer.load(f)
             return True, expires_at, value
 
     def _write(self, path, value, expires_at):
-        value = self.serializer.dumps(value)
-        expires_at = str(expires_at).encode() if expires_at else b''
-        data = expires_at + b'\n' + value + b'\n'
-        path.write_bytes(data)
+        with path.open('wb') as f:
+            self.serializer.dump(expires_at, f)
+            self.serializer.dump(value, f)
 
     def set(self, key, value, ttl=None):
         path = self._key_to_path(key)
