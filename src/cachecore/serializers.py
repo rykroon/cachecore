@@ -13,6 +13,16 @@ class Serializer(Protocol):
         ...
 
 
+@runtime_checkable
+class FileSerializer(Protocol):
+
+    def dump(self, obj: Any, f):
+        ...
+
+    def load(self, f):
+        ...
+
+
 class JSONSerializer:
 
     def __init__(self, encoder=None, decoder=None):
@@ -33,10 +43,13 @@ class JSONSerializer:
 
 class RedisSerializer:
 
+    def __init__(self, protocol=pickle.DEFAULT_PROTOCOL):
+        self.protocol = protocol
+
     def dumps(self, obj: Any) -> bytes:
         if type(obj) == int:
             return str(obj).encode()
-        return pickle.dumps(obj)
+        return pickle.dumps(obj, protocol=self.protocol)
 
     def loads(self, data: bytes) -> Any:
         try:
