@@ -1,3 +1,4 @@
+from functools import cache
 from math import ceil
 import time
 
@@ -16,3 +17,14 @@ def ttl_remaining(exp_time):
 
 def is_expired(exp_time):
     return ttl_remaining(exp_time) == 0
+
+
+class Singleton:
+    ...
+
+Singleton.__new__ = cache(Singleton.__new__)
+
+class KeepTTL(Singleton):
+    ...
+
+KEEP_TTL = KeepTTL()

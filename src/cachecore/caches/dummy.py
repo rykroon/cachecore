@@ -1,4 +1,5 @@
 from .base import BaseCache
+from ..utils import KEEP_TTL
 
 
 class DummyCache(BaseCache):
@@ -20,6 +21,9 @@ class DummyCache(BaseCache):
 
     def set(self, key, value, ttl=None):
         pass
+
+    def replace(self, key, value, ttl=KEEP_TTL):
+        return False
 
     def get_ttl(self, key, default=0):
         return default

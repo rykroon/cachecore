@@ -151,9 +151,18 @@ class AbstractCacheTest:
     def test_replace(self):
         assert self.cache.replace('a', 1) is False
         assert not self.cache.has_key('a')
-        self.cache.set('a', 1)
+
+        self.cache.set('a', 1, 300)
+
+        # replace and keep ttl
         assert self.cache.replace('a', 2) is True
+        assert self.cache.get_ttl('a', 300)
         assert self.cache.get('a') == 2
+
+        # replace and update ttl
+        assert self.cache.replace('a', 3, None) is True
+        assert self.cache.get_ttl('a') is None
+        assert self.cache.get('a') is 3
 
     def test_delete(self):
         assert self.cache.delete('a') is False

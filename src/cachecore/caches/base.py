@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from fnmatch import fnmatch
 from typing import Any, Optional, Protocol, runtime_checkable
+from ..utils import KEEP_TTL
 
 
 @runtime_checkable
@@ -48,7 +49,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def replace(self, key: str, value: Any, ttl: Optional[int]=None) -> bool:
+    def replace(self, key: str, value: Any, ttl: Optional[int]=KEEP_TTL) -> bool:
         """
             Set the key only if it already exists.
         """
@@ -134,11 +135,11 @@ class BaseCache:
         self.set(key, value, ttl)
         return True
 
-    def replace(self, key, value, ttl=None):
-        if not self.has_key(key):
-            return False
-        self.set(key, value, ttl)
-        return True
+    # def replace(self, key, value, ttl=KEEP_TTL):
+    #     if not self.has_key(key):
+    #         return False
+    #     self.set(key, value, ttl)
+    #     return True
 
     def delete(self, key):
         try:

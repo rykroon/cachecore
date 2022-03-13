@@ -3,7 +3,7 @@ from pathlib import Path
 import pickle
 
 from .base import BaseCache
-from ..utils import ttl_to_exptime, ttl_remaining, is_expired
+from ..utils import ttl_to_exptime, ttl_remaining, is_expired, KEEP_TTL
 
 
 class FileCache(BaseCache):
@@ -71,11 +71,7 @@ class FileCache(BaseCache):
         fname += self._ext
         return self._dir / fname
 
-    def _read(self, path, incttl=False, incval=False):
-        # if include value is True, then include expiration time must be True
-        if incval:
-            incttl = True
-
+    def _read(self, path, incval=False):
         if not path.exists():
             return False, None, None
 
@@ -88,55 +84,63 @@ class FileCache(BaseCache):
                 path.unlink(missing_ok=True)
                 return False, None, None
 
-            if not incttl:
-                return True, None, None
-
-            ttl = ttl_remaining(expires_at)
-
             if not incval:
-                return True, ttl, None
+                return True, expires_at, None
             
             line2 = f.read() # do not do readline() some serializers may have new line characters.
             line2 = line2.rstrip(b'\n')
             value = self.serializer.loads(line2)
-            return True, ttl, value
+            return True, expires_at, value
 
-    def _write(self, path, value, ttl):
+    def _write(self, path, value, expires_at):
         value = self.serializer.dumps(value)
-        exptime = ttl_to_exptime(ttl)
-        exptime = str(exptime).encode() if exptime else b''
-        data = exptime + b'\n' + value + b'\n'
+        expires_at = str(expires_at).encode() if expires_at else b''
+        data = expires_at + b'\n' + value + b'\n'
         path.write_bytes(data)
 
     def set(self, key, value, ttl=None):
         path = self._key_to_path(key)
-        self._write(path, value, ttl)
+        expires_at = ttl_to_exptime(ttl)
+        self._write(path, value, expires_at)
+
+    def replace(self, key, value, ttl=KEEP_TTL):
+        path = self._key_to_path(key)
+        exists, expires_at, _ = self._read(path)
+        if not exists:
+            return False
+
+        if ttl is not KEEP_TTL:
+            expires_at = ttl_to_exptime(ttl)
+
+        self._write(path, value, expires_at)
+        return True
 
     def get_ttl(self, key, default=0):
         path = self._key_to_path(key)
-        exists, ttl, _ = self._read(path, incttl=True)
+        exists, expires_at, _ = self._read(path)
         if not exists:
             return default
-        return ttl
+        return ttl_remaining(expires_at)
 
     def set_ttl(self, key, ttl=None):
         path = self._key_to_path(key)
         exists, _, value = self._read(path, incval=True)
         if not exists:
             return False
-        self._write(path, value, ttl)
+        expires_at = ttl_to_exptime(ttl)
+        self._write(path, value, expires_at)
         return True
 
     def incr(self, key, delta=1):
         path = self._key_to_path(key)
-        exists, ttl, value = self._read(path, incval=True)
+        exists, expires_at, value = self._read(path, incval=True)
 
         if not exists:
             value = 0
-            ttl = None
+            expires_at = None
 
         value += delta
-        self._write(path, value, ttl)
+        self._write(path, value, expires_at)
         return value
 
     def clear(self):

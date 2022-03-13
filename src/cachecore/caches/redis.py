@@ -1,6 +1,7 @@
 from functools import cached_property
 
 from ..serializers import RedisSerializer
+from ..utils import KEEP_TTL
 
 
 class RedisCache:
@@ -88,8 +89,10 @@ class RedisCache:
         value = self.serializer.dumps(value)
         return bool(self._client.set(key, value, ex=ttl, nx=True))
 
-    def replace(self, key, value, ttl=None):
+    def replace(self, key, value, ttl=KEEP_TTL):
         value = self.serializer.dumps(value)
+        if ttl is KEEP_TTL:
+            return bool(self._client.set(key, value, keepttl=True, xx=True))
         return bool(self._client.set(key, value, ex=ttl, xx=True))
 
     def delete(self, key):
