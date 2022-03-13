@@ -135,12 +135,6 @@ class BaseCache:
         self.set(key, value, ttl)
         return True
 
-    # def replace(self, key, value, ttl=KEEP_TTL):
-    #     if not self.has_key(key):
-    #         return False
-    #     self.set(key, value, ttl)
-    #     return True
-
     def delete(self, key):
         try:
             del self[key]
