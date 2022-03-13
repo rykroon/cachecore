@@ -1,4 +1,4 @@
-from hashlib import md5
+from base64 import b32encode, b32decode
 from pathlib import Path
 import pickle
 
@@ -48,7 +48,9 @@ class FileCache(BaseCache):
         return exists
 
     def __iter__(self):
-        raise NotImplementedError
+        for path in self._iterdir():
+            fname = path.name.rstrip(self._ext)
+            yield b32decode(fname).decode()
 
     def _createdir(self):
         if not self._dir.exists():
@@ -65,7 +67,7 @@ class FileCache(BaseCache):
             yield path
 
     def _key_to_path(self, key):
-        fname = md5(key.encode(), usedforsecurity=False).hexdigest()
+        fname = b32encode(key.encode()).decode()
         fname += self._ext
         return self._dir / fname
 

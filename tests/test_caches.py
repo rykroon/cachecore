@@ -248,14 +248,6 @@ class TestFileCache(unittest.TestCase, AbstractCacheTest):
                 fpath = os.path.join(dir, fname)
                 os.remove(fpath)
 
-    def test_iter(self):
-        with self.assertRaises(NotImplementedError):
-            iter(self.cache)
-
-    def test_keys(self):
-        with self.assertRaises(NotImplementedError):
-            iter(self.cache)
-
 
 class TestRedisCache(unittest.TestCase, AbstractCacheTest):
     def setUp(self):
