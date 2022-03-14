@@ -13,16 +13,6 @@ class Serializer(Protocol):
         ...
 
 
-@runtime_checkable
-class FileSerializer(Protocol):
-
-    def dump(self, obj: Any, f):
-        ...
-
-    def load(self, f):
-        ...
-
-
 class JSONSerializer:
 
     def __init__(self, encoder=None, decoder=None):

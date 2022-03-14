@@ -1,6 +1,7 @@
 from base64 import b32encode, b32decode
 from pathlib import Path
 import pickle
+from struct import pack, unpack
 
 from .base import BaseCache
 from ..utils import ttl_to_exptime, ttl_remaining, is_expired, KEEP_TTL
@@ -79,7 +80,10 @@ class FileCache(BaseCache):
             return False, None, None
 
         with path.open('rb') as f:
-            expires_at = self.serializer.load(f)
+            expires_at = unpack('d', f.read(8))[0]
+            if expires_at == 0.0:
+                expires_at = None
+
             if is_expired(expires_at):
                 f.close()
                 path.unlink(missing_ok=True)
@@ -88,13 +92,16 @@ class FileCache(BaseCache):
             if not incval:
                 return True, expires_at, None
 
-            value = self.serializer.load(f)
+            value = self.serializer.loads(f.read())
             return True, expires_at, value
 
     def _write(self, path, value, expires_at):
         with path.open('wb') as f:
-            self.serializer.dump(expires_at, f)
-            self.serializer.dump(value, f)
+            if expires_at is None:
+                expires_at = 0.0
+
+            f.write(pack('d', expires_at))
+            f.write(self.serializer.dumps(value))
 
     def set(self, key, value, ttl=None):
         path = self._key_to_path(key)
