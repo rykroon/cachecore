@@ -19,37 +19,55 @@ True
 >>> cache.has_key('a')
 False
 >>> cache.get('a')
-MissingKey
+None
 ```
 
 
 ## Complete API
 ```
-- get(self, key: str) -> Union[Any, MissingKey]
+    __getitem__(self, key: str) -> Any:
 
-- set(self, key: str, value: Any, ttl: Optional[int]=None)
+    __setitem__(self, key: str, value: Any):
 
-- add(self, key: str, value: Any, ttl: Optional[int]=None) -> bool
+    __delitem__(self, key: str):
 
-- delete(self, key: str) -> bool
+    __contains__(self, key: str):
 
-- has_key(self, key: str) -> bool
+    __iter__(self):
 
-- get_many(self, keys: list[str]) -> list[Any]
+    __len__(self):
 
-- set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int]=None)
+    keys(self, pattern: str = None):
 
-- delete_many(self, keys: list[str]) -> list[bool]:
+    get(self, key: str, default: Any = None) -> Any:
 
-- get_ttl(self, key: str) -> Union[int, None, MissingKey]
+    set(self, key: str, value: Any, ttl: Optional[int] = None):
 
-- set_ttl(self, key: str, ttl: Optional[int]=None)
+    add(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
 
-- incr(self, key, delta=1) -> int
+    replace(self, key: str, value: Any, ttl: Optional[int] = KEEP_TTL) -> bool:
 
-- decr(self, key, delta=1) -> int
+    delete(self, key: str) -> bool:
 
-- clear(self)
+    pop(self, key: str, default: Any = None):
+
+    has_key(self, key: str) -> bool:
+
+    get_many(self, keys: Iterable[str], default: Any = None) -> Iterable[Any]:
+
+    set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int] = None):
+
+    delete_many(self, keys: Iterable[str]) -> Iterable[bool]:
+
+    get_ttl(self, key: str, default: int = 0) -> Optional[int]:
+
+    set_ttl(self, key: str, ttl: Optional[int] = None) -> bool:
+
+    incr(self, key, delta=1) -> int:
+
+    decr(self, key, delta=1) -> int:
+
+    clear(self):
 ```
 
 
