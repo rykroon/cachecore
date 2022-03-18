@@ -22,9 +22,12 @@ def is_expired(exp_time):
 class Singleton:
     ...
 
+
 Singleton.__new__ = cache(Singleton.__new__)
+
 
 class KeepTTL(Singleton):
     ...
+
 
 KEEP_TTL = KeepTTL()

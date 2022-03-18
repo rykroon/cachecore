@@ -62,8 +62,8 @@ class RedisCache:
         cursor = -1
         while cursor != 0:
             cursor, keys = self._client.scan(
-                cursor=cursor, 
-                match=match, 
+                cursor=cursor,
+                match=match,
                 count=count
             )
             for key in keys:
@@ -153,9 +153,9 @@ class RedisCache:
         if ttl is None:
             pipeline = self._client.pipeline()
             # persist returns False if either the key does not exist
-            # OR if the key is already persisted. So we need to return 
+            # OR if the key is already persisted. So we need to return
             # the result of exists.
-            pipeline.persist(key) 
+            pipeline.persist(key)
             pipeline.exists(key)
             _, exists = pipeline.execute()
             return bool(exists)

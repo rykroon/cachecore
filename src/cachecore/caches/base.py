@@ -25,17 +25,17 @@ class CacheInterface(Protocol):
     def __len__(self):
         ...
 
-    def keys(self, pattern: str=None):
+    def keys(self, pattern: str = None):
         ...
 
-    def get(self, key: str, default: Any=None) -> Any:
+    def get(self, key: str, default: Any = None) -> Any:
         """
             Returns the value assigned to the key.
             Returns default if key is not found.
         """
         ...
 
-    def set(self, key: str, value: Any, ttl: Optional[int]=None):
+    def set(self, key: str, value: Any, ttl: Optional[int] = None):
         """
             Assign a value to a key.
             The key will expire after `ttl` seconds.
@@ -43,18 +43,17 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def add(self, key: str, value: Any, ttl: Optional[int]=None) -> bool:
+    def add(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
         """
             Set the key only if it doesn't already exist.
         """
         ...
 
-    def replace(self, key: str, value: Any, ttl: Optional[int]=KEEP_TTL) -> bool:
+    def replace(self, key: str, value: Any, ttl: Optional[int] = KEEP_TTL) -> bool:
         """
             Set the key only if it already exists.
         """
         ...
-
 
     def delete(self, key: str) -> bool:
         """
@@ -63,7 +62,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def pop(self, key: str, default: Any=None):
+    def pop(self, key: str, default: Any = None):
         """
             Deletes the key and returns the corresponding value.
         """
@@ -75,18 +74,18 @@ class CacheInterface(Protocol):
     def get_many(self, keys: list[str], default: Any = None) -> list[Any]:
         ...
 
-    def set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int]=None):
+    def set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int] = None):
         ...
 
     def delete_many(self, keys: list[str]) -> list[bool]:
         """
             Deletes all of the keys in the list.
-            Returns a list of boolean values indicating 
+            Returns a list of boolean values indicating
                 if the key was deleted.
         """
         ...
 
-    def get_ttl(self, key: str, default: int=0) -> Optional[int]:
+    def get_ttl(self, key: str, default: int = 0) -> Optional[int]:
         """
             Returns the TTL of the key.
             Returns None if key does not have a ttl.
@@ -94,7 +93,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def set_ttl(self, key: str, ttl: Optional[int]=None) -> bool:
+    def set_ttl(self, key: str, ttl: Optional[int] = None) -> bool:
         """
             Sets the TTL of the key.
             Returns True or False if the TTL was set.
