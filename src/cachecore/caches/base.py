@@ -22,10 +22,13 @@ class CacheInterface(Protocol):
     def __iter__(self):
         ...
 
-    def __len__(self):
+    def __len__(self) -> int:
         ...
 
-    def keys(self, pattern: str = None):
+    def keys(self, pattern: str = None) -> Iterable[str]:
+        """
+            Returns an iterable of keys that match the pattern.
+        """
         ...
 
     def get(self, key: str, default: Any = None) -> Any:
@@ -52,6 +55,7 @@ class CacheInterface(Protocol):
     def replace(self, key: str, value: Any, ttl: Optional[int] = KEEP_TTL) -> bool:
         """
             Set the key only if it already exists.
+            Keeps the TTL of the previous value if a new TTL is not given.
         """
         ...
 
