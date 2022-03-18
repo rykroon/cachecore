@@ -66,15 +66,15 @@ class TestDummyCache(unittest.TestCase):
         assert self.cache.has_key('a') is False
 
     def test_get_many(self):
-        assert self.cache.get_many(['a', 'b', 'c']) == [None] * 3
+        assert list(self.cache.get_many(['a', 'b', 'c'])) == [None] * 3
 
     def test_set_many(self):
         mapping = {'a': 1, 'b': 2, 'c': 3}.items()
         assert self.cache.set_many(mapping, None) is None
-        assert self.cache.get_many(['a', 'b', 'c']) == [None] * 3
+        assert list(self.cache.get_many(['a', 'b', 'c'])) == [None] * 3
 
     def test_delete_many(self):
-        assert self.cache.delete_many(['a', 'b', 'c']) == [False, False, False]
+        assert list(self.cache.delete_many(['a', 'b', 'c'])) == [False, False, False]
 
     def test_get_ttl(self):
         assert self.cache.get_ttl('a') == 0
@@ -205,22 +205,22 @@ class AbstractCacheTest:
         assert self.cache.set_ttl('b', 300) is False
 
     def test_get_set_many(self):
-        assert self.cache.get_many(['a', 'b', 'c']) == [None] * 3
+        assert list(self.cache.get_many(['a', 'b', 'c'])) == [None] * 3
 
         self.cache.set_many([('a', 1), ('b', 2), ('c', 3)])
-        assert self.cache.get_many(['a', 'b', 'c']) == [1, 2, 3]
+        assert list(self.cache.get_many(['a', 'b', 'c'])) == [1, 2, 3]
         for k in ['a', 'b', 'c']:
             assert self.cache.get_ttl(k) is None
 
         self.cache.set_many({'a': 1, 'b': 2, 'c': 3}.items(), 300)
-        assert self.cache.get_many(['a', 'b', 'c']) == [1, 2, 3]
+        assert list(self.cache.get_many(['a', 'b', 'c'])) == [1, 2, 3]
         for k in ['a', 'b', 'c']:
             assert self.cache.get_ttl(k) == 300
 
     def test_delete_many(self):
         self.cache.set_many({'a': 1, 'b': 2, 'c': 3}.items())
-        assert self.cache.delete_many(['a', 'b', 'c']) == [True] * 3
-        assert self.cache.get_many(['a', 'b', 'c']) == [None] * 3
+        assert list(self.cache.delete_many(['a', 'b', 'c'])) == [True] * 3
+        assert list(self.cache.get_many(['a', 'b', 'c'])) == [None] * 3
 
     def test_incr(self):
         assert self.cache.incr('a') == 1

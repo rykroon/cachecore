@@ -123,7 +123,7 @@ class RedisCache:
 
     def get_many(self, keys, default=None):
         values = self._client.mget(*keys)
-        return [default if v is None else self.serializer.loads(v) for v in values]
+        return (default if v is None else self.serializer.loads(v) for v in values)
 
     def set_many(self, mapping, ttl=None):
         pipeline = self._client.pipeline()
@@ -137,7 +137,7 @@ class RedisCache:
         pipeline = self._client.pipeline()
         for k in keys:
             pipeline.delete(k)
-        return [bool(result) for result in pipeline.execute()]
+        return (bool(result) for result in pipeline.execute())
 
     def get_ttl(self, key, default=0):
         result = self._client.ttl(key)

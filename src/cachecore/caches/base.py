@@ -71,13 +71,13 @@ class CacheInterface(Protocol):
     def has_key(self, key: str) -> bool:
         ...
 
-    def get_many(self, keys: list[str], default: Any = None) -> list[Any]:
+    def get_many(self, keys: Iterable[str], default: Any = None) -> Iterable[Any]:
         ...
 
     def set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int] = None):
         ...
 
-    def delete_many(self, keys: list[str]) -> list[bool]:
+    def delete_many(self, keys: Iterable[str]) -> Iterable[bool]:
         """
             Deletes all of the keys in the list.
             Returns a list of boolean values indicating
@@ -150,14 +150,14 @@ class BaseCache:
         return key in self
 
     def get_many(self, keys, default=None):
-        return [self.get(k, default) for k in keys]
+        return (self.get(k, default) for k in keys)
 
     def set_many(self, mapping, ttl=None):
         for k, v in mapping:
             self.set(k, v, ttl)
 
     def delete_many(self, keys):
-        return [self.delete(k) for k in keys]
+        return (self.delete(k) for k in keys)
 
     def decr(self, key, delta=1):
         return self.incr(key, -delta)
