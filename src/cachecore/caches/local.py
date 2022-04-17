@@ -77,17 +77,5 @@ class LocalCache(BaseCache):
             self.replace(key, value)
         return value
 
-        # if key not in self:
-        #     value = 0
-        #     ttl = None
-        #     value += delta
-        #     self.set(key, value, ttl)
-        #     return value
-
-        # value = self.get(key)
-        # value += delta
-        # self._data[key][0] = self.serializer.dumps(value)
-        # return value
-
     def clear(self):
         self._data.clear()
