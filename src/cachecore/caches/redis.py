@@ -118,7 +118,7 @@ class RedisCache:
             return default
         return self.serializer.loads(value)
 
-    def has_key(self, key):
+    def exists(self, key):
         return key in self
 
     def get_many(self, keys, default=None):

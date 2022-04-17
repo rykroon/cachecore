@@ -34,7 +34,7 @@ class FileCache(BaseCache):
         self._write(path, value, None)
 
     def __delitem__(self, key):
-        if not self.has_key(key):
+        if not self.exists(key):
             raise KeyError(key)
 
         path = self._key_to_path(key)

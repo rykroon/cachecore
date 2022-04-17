@@ -72,7 +72,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def has_key(self, key: str) -> bool:
+    def exists(self, key: str) -> bool:
         ...
 
     def get_many(self, keys: Iterable[str], default: Any = None) -> Iterable[Any]:
@@ -133,7 +133,7 @@ class BaseCache:
             return default
 
     def add(self, key, value, ttl=None):
-        if self.has_key(key):
+        if self.exists(key):
             return False
         self.set(key, value, ttl)
         return True
@@ -150,7 +150,7 @@ class BaseCache:
         self.delete(key)
         return value
 
-    def has_key(self, key):
+    def exists(self, key):
         return key in self
 
     def get_many(self, keys, default=None):

@@ -64,7 +64,7 @@ class LocalCache(BaseCache):
         return ttl_remaining(self._data[key][1])
 
     def set_ttl(self, key, ttl=None):
-        if not self.has_key(key):
+        if not self.exists(key):
             return False
         exp_time = ttl_to_exptime(ttl)
         self._data[key][1] = exp_time

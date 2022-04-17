@@ -12,11 +12,11 @@ Get, set, delete, and check for the existence of a key using the following.
 >>> cache.set('a', 1)
 >>> cache.get('a')
 1
->>> cache.has_key('a')
+>>> cache.exists('a')
 True
 >>> cache.delete('a')
 True
->>> cache.has_key('a')
+>>> cache.exists('a')
 False
 >>> cache.get('a')
 None
@@ -51,7 +51,7 @@ None
 
     pop(self, key: str, default: Any = None):
 
-    has_key(self, key: str) -> bool:
+    exists(self, key: str) -> bool:
 
     get_many(self, keys: Iterable[str], default: Any = None) -> Iterable[Any]:
 

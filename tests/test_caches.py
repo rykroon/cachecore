@@ -60,10 +60,10 @@ class TestDummyCache(unittest.TestCase):
         self.cache.set('a', 1, None)
         assert self.cache.delete('a') is False
 
-    def test_has_key(self):
-        assert self.cache.has_key('a') is False
+    def test_exists(self):
+        assert self.cache.exists('a') is False
         self.cache.set('a', 1, None)
-        assert self.cache.has_key('a') is False
+        assert self.cache.exists('a') is False
 
     def test_get_many(self):
         assert list(self.cache.get_many(['a', 'b', 'c'])) == [None] * 3
@@ -150,7 +150,7 @@ class AbstractCacheTest:
 
     def test_replace(self):
         assert self.cache.replace('a', 1) is False
-        assert not self.cache.has_key('a')
+        assert not self.cache.exists('a')
 
         self.cache.set('a', 1, 300)
 
@@ -181,15 +181,15 @@ class AbstractCacheTest:
         assert self.cache.pop('a') is None
         self.cache.set('a', 1)
         assert self.cache.pop('a') == 1
-        assert not self.cache.has_key('a')
+        assert not self.cache.exists('a')
 
-    def test_has_key(self):
-        assert self.cache.has_key('a') is False
+    def test_exists(self):
+        assert self.cache.exists('a') is False
         self.cache.set('a', 1)
-        assert self.cache.has_key('a') is True
+        assert self.cache.exists('a') is True
         self.cache.set('a', 1, 1)
         time.sleep(1)
-        assert self.cache.has_key('a') is False
+        assert self.cache.exists('a') is False
 
     def test_get_set_ttl(self):
         assert self.cache.get_ttl('a') == 0
@@ -238,7 +238,7 @@ class AbstractCacheTest:
         self.cache.set_many([('a', 1), ('b', 2), ('c', 3)])
         self.cache.clear()
         for k in ('a', 'b', 'c'):
-            assert self.cache.has_key(k) is False
+            assert self.cache.exists(k) is False
 
 
 class TestLocalCache(unittest.TestCase, AbstractCacheTest):
