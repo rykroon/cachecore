@@ -1,16 +1,16 @@
 import pickle
 import unittest
 
-from src.cachecore.serializers import JSONSerializer, RedisSerializer, Serializer
+from src.cachecore.serializers import JSONSerializer, RedisSerializer, SerializerInterface
 
 
 
 class TestSerializerInterface(unittest.TestCase):
 
     def test_all(self):
-        assert isinstance(pickle, Serializer)
-        assert issubclass(JSONSerializer, Serializer)
-        assert issubclass(RedisSerializer, Serializer)
+        assert isinstance(pickle, SerializerInterface)
+        assert issubclass(JSONSerializer, SerializerInterface)
+        assert issubclass(RedisSerializer, SerializerInterface)
 
 
 class AbstractSerializerTest(unittest.TestCase):
