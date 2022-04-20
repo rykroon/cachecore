@@ -1,10 +1,11 @@
 from functools import cached_property
 
+from .base import BaseCache
 from ..serializers import RedisSerializer
 from ..utils import KEEP_TTL
 
 
-class RedisCache:
+class RedisCache(BaseCache):
 
     serializer = RedisSerializer()
 
@@ -40,9 +41,6 @@ class RedisCache:
     def __iter__(self):
         return self._scan()
 
-    def __len__(self):
-        return len(list(self))
-
     @cached_property
     def _redis_version(self):
         info = self._client.info()
@@ -75,12 +73,6 @@ class RedisCache:
     def keys(self, pattern=None):
         return self._scan(match=pattern)
 
-    def get(self, key, default=None):
-        try:
-            return self[key]
-        except KeyError:
-            return default
-
     def set(self, key, value, ttl=None):
         value = self.serializer.dumps(value)
         self._client.set(key, value, ex=ttl)
@@ -94,13 +86,6 @@ class RedisCache:
         if ttl is KEEP_TTL:
             return bool(self._client.set(key, value, keepttl=True, xx=True))
         return bool(self._client.set(key, value, ex=ttl, xx=True))
-
-    def delete(self, key):
-        try:
-            del self[key]
-            return True
-        except KeyError:
-            return False
 
     def pop(self, key, default=None):
         # GETDEL is available since 6.2.0
@@ -117,9 +102,6 @@ class RedisCache:
         if value is None:
             return default
         return self.serializer.loads(value)
-
-    def exists(self, key):
-        return key in self
 
     def get_many(self, keys, default=None):
         values = self._client.mget(*keys)
