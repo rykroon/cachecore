@@ -3,12 +3,13 @@ import string
 import time
 import unittest
 
-
 import redis
+import pymemcache
 
 from src.cachecore.caches import CacheInterface
 from src.cachecore.caches import DummyCache
 from src.cachecore.caches import LocalCache
+from src.cachecore.caches import MemcachedCache
 from src.cachecore.caches import RedisCache
 from src.cachecore.caches import FileCache
 
@@ -162,7 +163,7 @@ class AbstractCacheTest:
         # replace and update ttl
         assert self.cache.replace('a', 3, None) is True
         assert self.cache.get_ttl('a') is None
-        assert self.cache.get('a') is 3
+        assert self.cache.get('a') == 3
 
     def test_delete(self):
         assert self.cache.delete('a') is False
@@ -263,6 +264,64 @@ class TestRedisCache(unittest.TestCase, AbstractCacheTest):
         client = redis.Redis()
         client.flushdb()
         self.cache = RedisCache(client=client)
+
+
+class TestMemcachedCache(unittest.TestCase, AbstractCacheTest):
+    def setUp(self):
+        self.client = pymemcache.Client('localhost')
+        self.client.flush_all()
+        self.cache = MemcachedCache(client=self.client)
+
+    def tearDown(self):
+        self.client.close()
+
+    def test_iter(self):
+        with self.assertRaises(NotImplementedError):
+            iter(self.cache)
+
+    def test_keys(self):
+        with self.assertRaises(NotImplementedError):
+            self.cache.keys()
+
+    def test_get_set_ttl(self):
+        with self.assertRaises(NotImplementedError):
+            self.cache.get_ttl('a')
+
+        with self.assertRaises(NotImplementedError):
+            self.cache.set_ttl('a', None)
+    
+    def test_get_set(self):
+        assert self.cache.get('a') is None
+        assert self.cache.get('a', default=1) == 1
+
+        self.cache.set('a', 1)
+        assert self.cache.get('a') == 1
+
+        self.cache.set('a', 1, 20)
+        assert self.cache.get('a') == 1
+
+    def test_get_set_many(self):
+        assert list(self.cache.get_many(['a', 'b', 'c'])) == [None] * 3
+
+        self.cache.set_many([('a', 1), ('b', 2), ('c', 3)])
+        assert list(self.cache.get_many(['a', 'b', 'c'])) == [1, 2, 3]
+
+        self.cache.set_many({'a': 1, 'b': 2, 'c': 3}.items(), 300)
+        assert list(self.cache.get_many(['a', 'b', 'c'])) == [1, 2, 3]
+
+    def test_replace(self):
+        assert self.cache.replace('a', 1, None) is False
+        assert not self.cache.exists('a')
+
+        self.cache.set('a', 1, 300)
+
+        # replace and keep ttl
+        assert self.cache.replace('a', 2, None) is True
+        assert self.cache.get('a') == 2
+
+        # replace and update ttl
+        assert self.cache.replace('a', 3, None) is True
+        assert self.cache.get('a') == 3
 
 
 if __name__ == '__main__':
