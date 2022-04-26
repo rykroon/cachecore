@@ -72,8 +72,8 @@ None
 
 
 ## Cache Implementations
-- Dummy
-- Local Memory
-- File System
-- Memcached (Coming Soon)
 - Redis
+- Memcached
+- File System
+- Local Memory
+- Dummy
