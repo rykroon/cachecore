@@ -17,9 +17,10 @@ from src.cachecore.caches import FileCache
 class TestProtocol(unittest.TestCase):
     def test_protocol(self):
         assert issubclass(DummyCache, CacheInterface)
-        assert issubclass(LocalCache, CacheInterface)
-        assert issubclass(RedisCache, CacheInterface)
         assert issubclass(FileCache, CacheInterface)
+        assert issubclass(LocalCache, CacheInterface)
+        assert issubclass(MemcachedCache, CacheInterface)
+        assert issubclass(RedisCache, CacheInterface)
 
 
 class TestDummyCache(unittest.TestCase):
