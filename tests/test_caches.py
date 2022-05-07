@@ -6,12 +6,8 @@ import unittest
 import redis
 import pymemcache
 
-from src.cachecore.caches import CacheInterface
-from src.cachecore.caches import DummyCache
-from src.cachecore.caches import LocalCache
-from src.cachecore.caches import MemcachedCache
-from src.cachecore.caches import RedisCache
-from src.cachecore.caches import FileCache
+from src.cachecore import CacheInterface, DummyCache, LocalCache, \
+    FileCache, MemcachedCache, RedisCache
 
 
 class TestProtocol(unittest.TestCase):

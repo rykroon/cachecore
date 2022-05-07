@@ -1,7 +1,7 @@
 import pickle
 
 from .base import BaseCache
-from ..utils import KEEP_TTL, is_expired, ttl_remaining, ttl_to_exptime
+from .utils import KEEP_TTL, is_expired, ttl_remaining, ttl_to_exptime
 
 
 class LocalCache(BaseCache):

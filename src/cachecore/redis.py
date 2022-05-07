@@ -1,8 +1,8 @@
 from functools import cached_property
 
 from .base import BaseCache
-from ..serializers import RedisSerializer
-from ..utils import KEEP_TTL
+from .serializers import RedisSerializer
+from .utils import KEEP_TTL
 
 
 class RedisCache(BaseCache):

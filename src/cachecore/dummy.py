@@ -1,5 +1,5 @@
 from .base import BaseCache
-from ..utils import KEEP_TTL
+from .utils import KEEP_TTL
 
 
 class DummyCache(BaseCache):

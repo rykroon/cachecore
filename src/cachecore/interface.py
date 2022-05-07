@@ -1,5 +1,5 @@
 from typing import Any, Iterable, Optional, Protocol, runtime_checkable
-from ..utils import KEEP_TTL
+from .utils import KEEP_TTL
 
 
 @runtime_checkable

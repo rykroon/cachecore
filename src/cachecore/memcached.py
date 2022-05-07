@@ -1,6 +1,6 @@
 from cachecore.utils import KEEP_TTL
 from .base import BaseCache
-from ..serializers import RedisSerializer
+from .serializers import RedisSerializer
 
 
 class MemcachedCache(BaseCache):

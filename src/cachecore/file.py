@@ -4,7 +4,7 @@ import pickle
 from struct import pack, unpack
 
 from .base import BaseCache
-from ..utils import ttl_to_exptime, ttl_remaining, is_expired, KEEP_TTL
+from .utils import ttl_to_exptime, ttl_remaining, is_expired, KEEP_TTL
 
 
 class FileCache(BaseCache):
