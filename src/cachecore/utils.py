@@ -20,10 +20,9 @@ def is_expired(exp_time):
 
 
 class Singleton:
-    ...
-
-
-Singleton.__new__ = cache(Singleton.__new__)
+    @cache
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, *args, **kwargs)
 
 
 class KeepTTL(Singleton):
