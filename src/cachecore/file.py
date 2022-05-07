@@ -57,10 +57,15 @@ class FileCache(BaseCache):
         return len(list(self._iterdir()))
 
     def _mkdir(self):
+        """Create the directory if it doesn/t exist.
+        """
         if not self._dir.exists():
             self._dir.mkdir()
 
     def _iterdir(self):
+        """Returns a generator of Path objects.
+        :returns: A generator of Path objects.
+        """
         for path in self._dir.iterdir():
             if not path.is_file():
                 continue
@@ -71,11 +76,22 @@ class FileCache(BaseCache):
             yield path
 
     def _key_to_path(self, key):
+        """Convert the key into a Path object.
+
+        :param key: The key.
+        :returns: A Path object.
+        """
         fname = b32encode(key.encode()).decode()
         fname += self._ext
         return self._dir / fname
 
     def _read(self, path, incval=False):
+        """Reads data from the file.
+
+        :param path: The path to read.
+        :param incval: True, if the value should be read, else False
+        :returns: A 3-tuple of exists, expires_at, and value.
+        """
         if not path.exists():
             return False, None, None
 
@@ -96,6 +112,12 @@ class FileCache(BaseCache):
             return True, expires_at, value
 
     def _write(self, path, value, expires_at):
+        """Write data to the file.
+
+        :param path: A Path object.
+        :param value: The value to write to the file.
+        :param expires_at: A timestamp of the expiration time.
+        """
         with path.open('wb') as f:
             if expires_at is None:
                 expires_at = 0.0
