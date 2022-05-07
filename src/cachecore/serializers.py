@@ -46,3 +46,6 @@ class RedisSerializer:
             return int(data)
         except ValueError:
             return pickle.loads(data)
+
+
+redis_serializer = RedisSerializer()

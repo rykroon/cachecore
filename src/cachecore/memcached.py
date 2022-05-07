@@ -1,11 +1,11 @@
 from cachecore.utils import KEEP_TTL
 from .base import BaseCache
-from .serializers import RedisSerializer
+from .serializers import redis_serializer
 
 
 class MemcachedCache(BaseCache):
 
-    serializer = RedisSerializer()
+    serializer = redis_serializer
 
     def __init__(self, client=None, **client_kwargs):
         if client and client_kwargs:
