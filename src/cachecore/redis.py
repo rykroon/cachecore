@@ -43,6 +43,9 @@ class RedisCache(BaseCache):
 
     @cached_property
     def _redis_version(self):
+        """Returns the redis version as a 3-tuple of ints.
+        :returns: A 3-tuple of ints representing the redis version.
+        """
         info = self._client.info()
         version = info['redis_version']
         version = (int(n) for n in version.split('.'))
@@ -55,6 +58,9 @@ class RedisCache(BaseCache):
             the application to handle the case of duplicated elements, for
             example only using the returned elements in order to perform
             operations that are safe when re-applied multiple times."
+
+            :param match: A glob-style pattern to match.
+            :param count: Number of elements to retrieve per call to the redis server.
         """
         key_set = set()
         cursor = -1
