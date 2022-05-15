@@ -99,6 +99,12 @@ class AbstractCacheTest:
 
         assert self.cache['a'] == 1
 
+        self.cache.set('b', 1, 1)
+        time.sleep(1)
+
+        with self.assertRaises(KeyError):
+            self.cache['b']
+
     def test_delitem(self):
         with self.assertRaises(KeyError):
             del self.cache['a']
@@ -107,12 +113,15 @@ class AbstractCacheTest:
         del self.cache['a']
 
     def test_iter(self):
-        letters = [char for char in string.ascii_letters]
-        data = dict.fromkeys(letters)
+        data = dict.fromkeys(string.ascii_letters)
         self.cache.set_many(data.items())
 
+        # Make sure that the key 'foo' is not counted.
+        self.cache.set('foo', 'bar', 1)
+        time.sleep(1)
+
         for key in self.cache:
-            assert key in letters
+            assert key in string.ascii_letters
 
     def test_keys(self):
         pattern = 'h*llo'
