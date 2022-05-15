@@ -50,6 +50,9 @@ class FileCache(BaseCache):
 
     def __iter__(self):
         for path in self._iterdir():
+            exists, _, _ = self._read(path)
+            if not exists:
+                continue
             fname = path.name.rstrip(self._ext)
             yield b32decode(fname).decode()
 
