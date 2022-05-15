@@ -74,7 +74,7 @@ class RedisCache(BaseCache):
                 if key in key_set:
                     continue
                 key_set.add(key)
-                yield key
+                yield key.decode()
 
     def keys(self, pattern=None):
         return self._scan(match=pattern)
