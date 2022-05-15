@@ -1,7 +1,26 @@
+from dataclasses import dataclass
 import pickle
+from typing import Any, Optional
 
 from .base import BaseCache
 from .utils import KEEP_TTL, is_expired, ttl_remaining, ttl_to_exptime
+
+
+@dataclass(slots=True)
+class ExpiryValue:
+    value: Any
+    expires_at: Optional[float] = None
+
+    @property
+    def ttl(self):
+        return ttl_remaining(self.expires_at)
+
+    @ttl.setter
+    def ttl(self, value):
+        self.expires_at = ttl_to_exptime(value)
+
+    def is_expired(self):
+        return is_expired(self.expires_at)
 
 
 class LocalCache(BaseCache):
@@ -9,65 +28,72 @@ class LocalCache(BaseCache):
     serializer = pickle
 
     def __init__(self):
-        self._data = {}
+        self._data: dict[str, ExpiryValue] = {}
 
     def __getitem__(self, key):
-        if key not in self:
+        expval = self._get(key)
+        if expval is None:
             raise KeyError(key)
-        value = self._data[key][0]
-        return self.serializer.loads(value)
+        return self.serializer.loads(expval.value)
 
     def __setitem__(self, key, value):
-        self._set(key, value, None)
+        self._set(key, value)
 
     def __delitem__(self, key):
-        if key not in self:
-            raise KeyError(key)
+        self._get(key) # delete key if it has expired.
         del self._data[key]
 
     def __contains__(self, key):
-        if key not in self._data:
-            return False
-
-        expires_at = self._data[key][1]
-        if is_expired(expires_at):
-            del self._data[key]
-            return False
-
-        return True
+        return self._get(key) is not None
 
     def __iter__(self):
-        return iter(self._data)
+        for k in list(self._data.keys()):
+            if self._get(k) is None:
+                continue
+            yield k
 
-    def __len__(self):
-        return len(self._data)
+    def _get(self, key):
+        expval = self._data.get(key)
+        if expval is None:
+            return None
 
-    def _set(self, key, value, expires_at=None):
+        if expval.is_expired():
+            del self._data[key]
+            return None
+
+        return expval
+
+    def _set(self, key, value, ttl=None):
         value = self.serializer.dumps(value)
-        self._data[key] = [value, expires_at]
+        expval = ExpiryValue(value=value)
+        expval.ttl = ttl
+        self._data[key] = expval
 
     def set(self, key, value, ttl=None):
-        expires_at = ttl_to_exptime(ttl)
-        self._set(key, value, expires_at)
+        self._set(key, value, ttl)
 
     def replace(self, key, value, ttl=KEEP_TTL):
-        if key not in self:
+        expval = self._get(key)
+        if expval is None:
             return False
-        self._data[key][0] = self.serializer.dumps(value)
+
+        expval.value = self.serializer.dumps(value)
         if ttl is not KEEP_TTL:
-            self._data[key][1] = ttl_to_exptime(ttl)
+            expval.ttl = ttl
         return True
 
     def get_ttl(self, key, default=0):
-        if key not in self:
+        expval = self._get(key)
+        if expval is None:
             return default
-        return ttl_remaining(self._data[key][1])
+        return expval.ttl
 
     def set_ttl(self, key, ttl=None):
-        if not self.exists(key):
+        expval = self._get(key)
+        if expval is None:
             return False
-        exp_time = ttl_to_exptime(ttl)
-        self._data[key][1] = exp_time
+
+        expval.ttl = ttl
         return True
 
     def incr(self, key, delta=1):
