@@ -47,8 +47,9 @@ class LocalCache(BaseCache):
         return self._get(key) is not None
 
     def __iter__(self):
-        for k, v in self._data.items():
+        for k, v in tuple(self._data.items()):
             if v.is_expired():
+                del self._data[k]
                 continue
             yield k
 
