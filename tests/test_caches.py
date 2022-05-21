@@ -235,6 +235,12 @@ class AbstractCacheTest:
         assert self.cache.incr('b', 10) == 10
         assert self.cache.incr('b', 10) == 20
 
+        # Check that ttl behaves correctly after incrementing.
+        self.cache.set('c', 1, 1)
+        assert self.cache.incr('c') == 2
+        time.sleep(1)
+        assert self.cache.incr('c') == 1
+
     def test_decr(self):
         assert self.cache.decr('a') == -1
         assert self.cache.decr('a') == -2
