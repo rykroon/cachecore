@@ -56,9 +56,6 @@ class FileCache(BaseCache):
             fname = path.name.rstrip(self._ext)
             yield b32decode(fname).decode()
 
-    def __len__(self):
-        return len(list(self._iterdir()))
-
     def _mkdir(self):
         """Create the directory if it doesn/t exist.
         """
