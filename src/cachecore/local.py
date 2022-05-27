@@ -1,26 +1,7 @@
-from dataclasses import dataclass
 import pickle
-from typing import Any, Optional
 
 from .base import BaseCache
-from .utils import KEEP_TTL, is_expired, ttl_remaining, ttl_to_exptime
-
-
-@dataclass(slots=True)
-class ExpiryValue:
-    value: Any
-    expires_at: Optional[float] = None
-
-    @property
-    def ttl(self):
-        return ttl_remaining(self.expires_at)
-
-    @ttl.setter
-    def ttl(self, value):
-        self.expires_at = ttl_to_exptime(value)
-
-    def is_expired(self):
-        return is_expired(self.expires_at)
+from .utils import KEEP_TTL, ExpiryValue
 
 
 class LocalCache(BaseCache):

@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 from functools import cache
 from math import ceil
 import time
-from typing import Optional
+from typing import Optional, Any
 
 
 def ttl_to_exptime(ttl: Optional[int]) -> float:
@@ -18,6 +19,23 @@ def ttl_remaining(exp_time: Optional[float]) -> int:
 
 def is_expired(exp_time: Optional[float]) -> bool:
     return ttl_remaining(exp_time) == 0
+
+
+@dataclass(slots=True)
+class ExpiryValue:
+    value: Any
+    expires_at: Optional[float] = None
+
+    @property
+    def ttl(self):
+        return ttl_remaining(self.expires_at)
+
+    @ttl.setter
+    def ttl(self, value):
+        self.expires_at = ttl_to_exptime(value)
+
+    def is_expired(self):
+        return is_expired(self.expires_at)
 
 
 class Singleton:
