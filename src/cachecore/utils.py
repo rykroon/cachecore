@@ -5,19 +5,19 @@ import time
 from typing import Optional, Any
 
 
-def ttl_to_exptime(ttl: Optional[int]) -> float:
+def ttl_to_exptime(ttl: int | None) -> float | None:
     if ttl is None:
         return None
     return time.time() + ttl
 
 
-def ttl_remaining(exp_time: Optional[float]) -> int:
+def ttl_remaining(exp_time: float | None) -> int | None:
     if exp_time is None:
         return None
     return max(0, ceil(exp_time - time.time()))
 
 
-def is_expired(exp_time: Optional[float]) -> bool:
+def is_expired(exp_time: float | None) -> bool:
     return ttl_remaining(exp_time) == 0
 
 
