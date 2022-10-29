@@ -1,4 +1,5 @@
 import pickle
+import typing as t
 
 from .base import BaseCache
 from .utils import KEEP_TTL, ExpiryValue
@@ -11,30 +12,30 @@ class LocalCache(BaseCache):
     def __init__(self):
         self._data: dict[str, ExpiryValue] = {}
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> t.Any:
         expval = self._get(key)
         if expval is None:
             raise KeyError(key)
         return self.serializer.loads(expval.value)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: t.Any):
         self._set(key, value)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: str) -> None:
         self._get(key) # delete key if it has expired.
         del self._data[key]
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return self._get(key) is not None
 
-    def __iter__(self):
+    def __iter__(self) -> t.Iterable:
         for k, v in tuple(self._data.items()):
             if v.is_expired():
                 del self._data[k]
                 continue
             yield k
 
-    def _get(self, key):
+    def _get(self, key: str):
         expval = self._data.get(key)
         if expval is None:
             return None
@@ -45,16 +46,16 @@ class LocalCache(BaseCache):
 
         return expval
 
-    def _set(self, key, value, ttl=None):
+    def _set(self, key: str, value: t.Any, ttl: int | None = None) -> None:
         value = self.serializer.dumps(value)
         expval = ExpiryValue(value=value)
         expval.ttl = ttl
         self._data[key] = expval
 
-    def set(self, key, value, ttl=None):
+    def set(self, key: str, value: t.Any, ttl: int | None = None):
         self._set(key, value, ttl)
 
-    def replace(self, key, value, ttl=KEEP_TTL):
+    def replace(self, key: str, value: int | None, ttl: int | None = KEEP_TTL):
         expval = self._get(key)
         if expval is None:
             return False
@@ -64,13 +65,13 @@ class LocalCache(BaseCache):
             expval.ttl = ttl
         return True
 
-    def get_ttl(self, key, default=0):
+    def get_ttl(self, key: str, default: int = 0) -> int:
         expval = self._get(key)
         if expval is None:
             return default
         return expval.ttl
 
-    def set_ttl(self, key, ttl=None):
+    def set_ttl(self, key: str, ttl: int | None = None) -> bool:
         expval = self._get(key)
         if expval is None:
             return False
@@ -78,12 +79,12 @@ class LocalCache(BaseCache):
         expval.ttl = ttl
         return True
 
-    def incr(self, key, delta=1):
+    def incr(self, key: str, delta: int = 1) -> int:
         value = self.get(key, default=0)
         value += delta
         if not self.add(key, value):
             self.replace(key, value)
         return value
 
-    def clear(self):
+    def clear(self) -> None:
         self._data.clear()

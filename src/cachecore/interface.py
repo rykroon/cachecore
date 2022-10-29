@@ -1,14 +1,14 @@
-from typing import Any, Iterable, Optional, Protocol, runtime_checkable
+import typing as t
 from .utils import KEEP_TTL
 
 
-@runtime_checkable
-class CacheInterface(Protocol):
+@t.runtime_checkable
+class CacheInterface(t.Protocol):
 
-    def __getitem__(self, key: str) -> Any:
+    def __getitem__(self, key: str) -> t.Any:
         ...
 
-    def __setitem__(self, key: str, value: Any):
+    def __setitem__(self, key: str, value: t.Any):
         ...
 
     def __delitem__(self, key: str):
@@ -23,7 +23,7 @@ class CacheInterface(Protocol):
     def __len__(self) -> int:
         ...
 
-    def keys(self, pattern: str = None) -> Iterable[str]:
+    def keys(self, pattern: str | None = None) -> t.Iterable[str]:
         """Returns an iterable of keys that match the pattern.
         
         :param pattern: The pattern to be matched.
@@ -31,7 +31,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self, key: str, default: t.Any = None) -> t.Any:
         """Returns the value associated with the key.
         
         :param key: The key to be retrieved.
@@ -40,7 +40,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def set(self, key: str, value: Any, ttl: Optional[int] = None):
+    def set(self, key: str, value: t.Any, ttl: int | None = None):
         """Assign a value to a key.
 
         :param key: The key to be set.
@@ -49,7 +49,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def add(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
+    def add(self, key: str, value: t.Any, ttl: int | None = None) -> bool:
         """Set the value only if the key doesn't already exist.
 
         :param key: The key to be set.
@@ -59,7 +59,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def replace(self, key: str, value: Any, ttl: Optional[int] = KEEP_TTL) -> bool:
+    def replace(self, key: str, value: t.Any, ttl: int | None = KEEP_TTL) -> bool:
         """Set the value only if the key already exists.
         
         :param key: The key to be set.
@@ -77,7 +77,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def pop(self, key: str, default: Any = None):
+    def pop(self, key: str, default: t.Any = None):
         """Deletes the key and returns the associated value.
 
         :param key: The key to be deleted.
@@ -94,7 +94,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def get_many(self, keys: Iterable[str], default: Any = None) -> Iterable[Any]:
+    def get_many(self, keys: t.Iterable[str], default: t.Any = None) -> t.Iterable[t.Any]:
         """Returns an iterable of values.
 
         :param keys: An iterable of keys to retrieve.
@@ -103,7 +103,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def set_many(self, mapping: Iterable[tuple[str, Any]], ttl: Optional[int] = None):
+    def set_many(self, mapping: t.Iterable[tuple[str, t.Any]], ttl: int | None = None):
         """Stores the mapping of key value pairs.
 
         :param mapping: An iterable of key, value tuples.
@@ -111,7 +111,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def delete_many(self, keys: Iterable[str]) -> Iterable[bool]:
+    def delete_many(self, keys: t.Iterable[str]) -> t.Iterable[bool]:
         """Deletes all of the keys in the iterable.
 
         :param keys: An iterable of keys to be deleted.
@@ -119,7 +119,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def get_ttl(self, key: str, default: int = 0) -> Optional[int]:
+    def get_ttl(self, key: str, default: int = 0) -> int | None:
         """Returns the TTL of the key.
 
         :param key: The key.
@@ -128,7 +128,7 @@ class CacheInterface(Protocol):
         """
         ...
 
-    def set_ttl(self, key: str, ttl: Optional[int] = None) -> bool:
+    def set_ttl(self, key: str, ttl: int | None = None) -> bool:
         """Sets the TTL of the key.
 
         :param key: The key.
