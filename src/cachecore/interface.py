@@ -1,10 +1,13 @@
 from abc import abstractmethod
-from collections.abc import MutableMapping
 from typing import Any, Iterable
 from .utils import KEEP_TTL
 
 
-class CacheInterface(MutableMapping):
+class CacheInterface:
+
+    @abstractmethod
+    def get(self, key: str, default=None):
+        pass
 
     @abstractmethod
     def set(self, key: str, value: Any, ttl: int | None = None):
@@ -28,14 +31,15 @@ class CacheInterface(MutableMapping):
         pass
 
     @abstractmethod
-    def replace(self, key: str, value: Any, ttl: int | None = KEEP_TTL) -> bool:
-        """Set the value only if the key already exists.
-        
-        :param key: The key to be set.
-        :param value: The value to be stored.
-        :param ttl: The time-to-live. By default, it will keep the ttl.
-        :returns: True, if the key was added, else False.
-        """
+    def delete(self, key: str) -> bool:
+        pass
+
+    @abstractmethod
+    def has(self, key: str) -> bool:
+        pass
+
+    @abstractmethod
+    def get_or_set(self, key: str, value: Any, ttl: int | None = None):
         pass
 
     @abstractmethod
@@ -67,17 +71,7 @@ class CacheInterface(MutableMapping):
         pass
 
     @abstractmethod
-    def get_ttl(self, key: str, default: int = 0) -> int | None:
-        """Returns the TTL of the key.
-
-        :param key: The key.
-        :param default: The default value to return if the key does not exist.
-        :returns: The time-to-live.
-        """
-        pass
-
-    @abstractmethod
-    def set_ttl(self, key: str, ttl: int | None = None) -> bool:
+    def touch(self, key: str, ttl: int | None = None) -> bool:
         """Sets the TTL of the key.
 
         :param key: The key.
@@ -106,4 +100,8 @@ class CacheInterface(MutableMapping):
         :param delta: The amount to decrement.
         :returns: The amount.
         """
+        pass
+
+    @abstractmethod
+    def clear(self):
         pass
