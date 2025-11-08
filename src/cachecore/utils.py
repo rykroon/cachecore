@@ -1,12 +1,8 @@
 from collections.abc import MutableMapping
 from dataclasses import dataclass, field, InitVar
-from functools import cache
 from math import ceil
 import time
 from typing import Any
-
-
-_missing_key = object()
 
 
 @dataclass(slots=True)
@@ -17,7 +13,7 @@ class ExpiryValue:
 
     def __post_init__(self, ttl: int | None):
         self.ttl = ttl
-    
+
     def __repr__(self):
         return "EXPIRED" if self.is_expired() else repr(self.value)
 
@@ -44,15 +40,19 @@ class ExpiryDict(MutableMapping[str, ExpiryValue]):
     def __repr__(self):
         return repr(self._data)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> ExpiryValue:
         item = self._data.get(key)
         if item is None or item.is_expired():
             self._data.pop(key, None)
             raise KeyError(key)
-        return item.value
+        return item
 
     def set(self, key: str, value: Any, ttl: int | None = None):
         self[key] = ExpiryValue(value, ttl)
+    
+    # def add(...) ?
+
+    # def replace(...) ?
 
     def __setitem__(self, key: str, item: ExpiryValue):
         self._data[key] = item
@@ -67,18 +67,4 @@ class ExpiryDict(MutableMapping[str, ExpiryValue]):
                 yield key
 
     def __len__(self):
-        list(iter(self)) # Remove all expired keys
-        return len(self._data)
-
-
-class Singleton:
-    @cache
-    def __new__(cls, *args, **kwargs):
-        return super().__new__(cls, *args, **kwargs)
-
-
-class KeepTTL(Singleton):
-    ...
-
-
-KEEP_TTL = KeepTTL()
+        return len(list(iter(self)))

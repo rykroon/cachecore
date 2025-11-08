@@ -1,6 +1,6 @@
 from typing import Any, Iterable, Mapping
 
-from .utils import ExpiryValue, ExpiryDict, _missing_key
+from .utils import ExpiryDict
 
 
 class DictCache:
@@ -9,16 +9,17 @@ class DictCache:
         self._data: ExpiryDict = ExpiryDict()
 
     def get(self, key: str, default=None):
-        return self._data.get(key, default)
+        item =  self._data.get(key)
+        return default if item is None else item.value
 
     def set(self, key: str, value: Any, ttl: int | None = None):
         self._data.set(key, value, ttl)
 
     def delete(self, *keys: str) -> int:
-        return sum(self._data.pop(k, _missing_key) is not _missing_key for k in keys)
+        return sum(self._data.pop(k, None) is not None for k in keys)
 
     def exists(self, *keys: str) -> int:
-        return sum(k in self._data for k in keys)
+        return sum(k in self for k in keys)
 
     def __contains__(self, key: str) -> bool:
         return key in self._data
@@ -29,26 +30,49 @@ class DictCache:
             return True
         return False
 
-    def replace(self, key: str, value: Any):
+    def replace(self, key: str, value: Any, ttl: int | None = None, keepttl: bool = False):
+        if ttl and bool:
+            raise ValueError("ttl and keepttl are emutually exclusive")
+
+        item = self._data.get(key)
+        if item is None:
+            return False
+        
+        item.value = value
+        if ttl is not None:
+            item.ttl = ttl
+        
+        return True
+
+    def ttl(self, key: str) -> int:
+        item = self._data.get(key)
+        return None if item is None else item.ttl
+    
+    def expire(self, key: str, ttl: int) -> bool:
+        item = self._data.get(key)
+        if item is None:
+            return False
+
+        item.ttl = ttl
+        return True
+    
+    def persist(self, key: str):
         pass
 
-    def get_many(self, keys: Iterable[str]) -> dict[str, Any]:
-        return {
-            k: ev.value
-            for k, ev in self._data.items()
-            if k in keys and not ev.is_expired()
-        }
+    def get_many(self, keys: Iterable[str], default=None) -> list[Any]:
+        return [self.get(k, default) for k in keys]
 
-    def set_many(self, data: Mapping, ttl: int | None = None) -> list[str]:
-        values = {k: ExpiryValue(v, ttl) for k, v in data.items()}
-        self._data.update(values)
-        return []
+    def set_many(self, data: Mapping, ttl: int | None = None):
+        for k, v in data.items():
+            self.set(k, v, ttl)
 
-    def incr(self, key: str, delta: int = 1) -> int:
-        pass
+    def incr(self, key: str, amount: int = 1) -> int:
+        value = self.get(key, 0) + amount
+        self.set(key, value)
+        return value
 
-    def decr(self, key: str, delta: int = 1) -> int:
-        return self.incr(key, -delta)
+    def decr(self, key: str, amount: int = 1) -> int:
+        return self.incr(key, -amount)
 
     def clear(self) -> None:
         self._data.clear()

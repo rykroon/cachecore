@@ -1,6 +1,12 @@
 from abc import abstractmethod
-from typing import Any, Iterable
-from .utils import KEEP_TTL
+from collections.abc import Mapping
+import enum
+from typing import Any
+
+
+class TTLStatus(enum.IntEnum):
+    PERSISTENT = -1
+    MISSING = -2
 
 
 class CacheInterface:
@@ -39,14 +45,30 @@ class CacheInterface:
         pass
 
     @abstractmethod
+    def get_many(self, *keys: str, default=None) -> list[Any]:
+        pass
+
+    @abstractmethod
+    def set_many(self, mapping: Mapping):
+        pass
+
+    @abstractmethod
     def exists(self, *keys: str) -> int:
         pass
 
     def __contains__(self, key: str) -> bool:
-        return self.exists(key) == 1
+        pass
     
     @abstractmethod
-    def ttl(self, key: str) -> int:
+    def ttl(self, key: str) -> int | TTLStatus:
+        pass
+
+    @abstractmethod
+    def expire(self, key: str, ex: int) -> bool:
+        pass
+
+    @abstractmethod
+    def persist(self, key: str) -> bool:
         pass
 
     @abstractmethod
